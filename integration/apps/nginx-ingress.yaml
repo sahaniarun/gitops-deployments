@@ -1,0 +1,30 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: nginx
+  namespace: argocd
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+spec:
+  destination:
+    namespace: default
+    server: https://kubernetes.default.svc
+  project: default
+  sources:
+    - chart: nginx-ingress
+      repoURL: oci://ghcr.io/nginxinc/charts/nginx-ingress
+      targetRevision: 1.1.3
+      helm:
+        valueFiles:
+          $values/integration/apps/nginx-ingress.values.yaml
+    - ref: values
+      repoURL: https://github.com/glaciation-heu/gitops-deployments
+      targetRevision: HEAD        
+  syncPolicy:
+    automated:
+     prune: true
+     selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+
