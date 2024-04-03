@@ -34,7 +34,7 @@ spec:
               port: 80
 
               ## The custom NodePort for the HTTP port. Requires controller.service.type set to NodePort.
-              hostPort: 80
+              nodePort: 80
 
               ## The HTTP port on the POD where the Ingress Controller service is running.
               targetPort: 80
