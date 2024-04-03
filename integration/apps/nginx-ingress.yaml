@@ -25,7 +25,7 @@ spec:
             master: "true"
           service:
             ## The type of service to create for the Ingress Controller.
-            type: NodePort
+            type: LoadBalancer
             httpPort:
               ## Enables the HTTP port for the Ingress Controller service.
               enable: true
@@ -34,23 +34,23 @@ spec:
               port: 80
 
               ## The custom NodePort for the HTTP port. Requires controller.service.type set to NodePort.
-              nodePort: 80
+#              nodePort: 80
 
               ## The HTTP port on the POD where the Ingress Controller service is running.
               targetPort: 80
 
-            httpsPort:
-              ## Enables the HTTPS port for the Ingress Controller service.
-              enable: true
-
-              ## The HTTPS port of the Ingress Controller service.
-              port: 443
-
-              ## The custom NodePort for the HTTPS port. Requires controller.service.type set to NodePort.
-              nodePort: 31443
-
-              ## The HTTPS port on the POD where the Ingress Controller service is running.
-              targetPort: 443
+#            httpsPort:
+#              ## Enables the HTTPS port for the Ingress Controller service.
+#              enable: true
+#
+#              ## The HTTPS port of the Ingress Controller service.
+#              port: 443
+#
+#              ## The custom NodePort for the HTTPS port. Requires controller.service.type set to NodePort.
+#              nodePort: 31443
+#
+#              ## The HTTPS port on the POD where the Ingress Controller service is running.
+#              targetPort: 443
 
           tolerations:
             - key: "node-role.kubernetes.io/control-plane"
