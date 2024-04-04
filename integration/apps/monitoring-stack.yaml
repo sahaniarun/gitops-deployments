@@ -26,6 +26,8 @@ spec:
             pathType: Prefix
             hosts:
               - grafana.integration
+        kepler:
+          enabled: true
 
   syncPolicy:
     automated:
