@@ -11,7 +11,7 @@ spec:
     server: https://kubernetes.default.svc
   project: default
   source:
-    repoURL: https://glaciation-heu.github.io/glaciaition-metadata-service/helm-charts/
+    repoURL: https://glaciation-heu.github.io/glaciation-metadata-service/helm-charts/
     chart: glaciation-metadata-service
     targetRevision: 0.*.*
   syncPolicy:
