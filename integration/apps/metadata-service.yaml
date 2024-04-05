@@ -12,7 +12,7 @@ spec:
   project: default
   source:
     repoURL: https://glaciation-heu.github.io/glaciation-metadata-service/helm-charts/
-    chart: glaciation-metadata-service
+    chart: metadata-service
     targetRevision: 0.*.*
   syncPolicy:
     automated:
