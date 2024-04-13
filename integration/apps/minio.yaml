@@ -16,6 +16,16 @@ spec:
     repoURL: https://operator.min.io
     chart: minio-operator
     targetRevision: 4.3.7
+    helm:
+      valuesObject:
+        console:
+          ingress:
+            enabled: true
+            ingressClassName: "nginx"
+            host: minio-console.integration
+            path: /
+            pathType: Prefix
+        tenants: []
   syncPolicy:
     automated:
      prune: true
