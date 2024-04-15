@@ -14,17 +14,18 @@ spec:
   project: default
   source:
     repoURL: https://operator.min.io
-    chart: minio-operator
-    targetRevision: 4.3.7
+    chart: operator
+    targetRevision: 5.0.13
     helm:
       valuesObject:
         console:
           ingress:
-            enabled: true
-            ingressClassName: "nginx"
-            host: minio-console.integration
-            path: /
-            pathType: Prefix
+            enabled: false
+          # The ingress is not working well in our *no balancer setup* with fixed ingress controller IP
+          #   ingressClassName: "nginx"
+          #   host: minio-console.integration
+          #   path: /
+          #   pathType: Prefix
         tenants: []
   syncPolicy:
     automated:
