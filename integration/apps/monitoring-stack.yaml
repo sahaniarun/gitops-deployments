@@ -22,6 +22,11 @@ spec:
         prometheus:
           server:
             remoteWrite: []
+          alertmanager:
+            ## If false, alertmanager will not be installed
+            enabled: false
+        influxdb:
+          enabled: false
 
         grafana:
           adminPassword: donkeyhot
