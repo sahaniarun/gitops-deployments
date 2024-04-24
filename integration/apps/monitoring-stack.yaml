@@ -19,6 +19,7 @@ spec:
     helm:
       valuesObject:
         grafana:
+          adminPassword: donkeyhot
           ingress:
             enabled: true
             ingressClassName: nginx
