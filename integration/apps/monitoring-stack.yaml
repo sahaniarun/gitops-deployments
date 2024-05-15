@@ -70,6 +70,11 @@ spec:
             pathType: Prefix
             hosts:
               - grafana.integration
+          grafana.ini:
+            auth.anonymous:
+              enabled: true
+            auth:
+              signout_redirect_url: /
         kepler:
           enabled: true
 
