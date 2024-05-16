@@ -13,8 +13,6 @@ spec:
     targetRevision: 0.10.0
     helm:
       valuesObject:
-        service:
-          type: NodePort
         config:
           secretKey: supersecuresecretkey 
         # ingress:

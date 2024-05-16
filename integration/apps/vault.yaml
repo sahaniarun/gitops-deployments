@@ -7,6 +7,16 @@ metadata:
   labels:
     create-ca-bundle: "true"
 ---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: minio-kes-secret
+  namespace: vault
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+    replicator.v1.mittwald.de/replicate-from: minio-tenant/minio-kes-secret
+data: {}
+---
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
@@ -54,6 +64,7 @@ metadata:
   name: vault
   namespace: argocd
   annotations:
+    argocd.argoproj.io/compare-options: ServerSideDiff=true
     argocd.argoproj.io/sync-wave: "-1"
   finalizers:
    - resources-finalizer.argocd.argoproj.io
@@ -96,7 +107,6 @@ spec:
             enabled: false
           service:
             enabled: true
-            type: NodePort
             active:
               enabled: false
             standby:
@@ -111,7 +121,22 @@ spec:
             storageClass: local-path
           ui:
             enabled: true
-            serviceType: NodePort
+          ingress:
+            enabled: true
+            ingressClassName: nginx
+            annotations:
+              # NOTE: To make sure the certificate is trusted by clients we should use
+              # something like Let's Encrypt
+              cert-manager.io/cluster-issuer: "private-ca-issuer"
+              nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+              nginx.ingress.kubernetes.io/ssl-redirect: "true"
+            tls:
+            - hosts:
+              - vault.integration
+              secretName: vault-ingress
+            hosts:
+            - host: vault.integration
+            activeService: false
           affinity: ""
           ha:
             enabled: true
