@@ -10,6 +10,8 @@ spec:
     repoURL: https://github.com/glaciation-heu/gitops-deployments
     path: integration/apps
     targetRevision: HEAD
+    directory:
+      recurse: true
   destination:
     namespace: argo-cd
     server: https://kubernetes.default.svc
