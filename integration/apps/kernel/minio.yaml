@@ -4,7 +4,8 @@ metadata:
   name: minio
   namespace: argocd
   annotations:
-    argocd.argoproj.io/compare-options: ServerSideDiff=true  
+    argocd.argoproj.io/compare-options: ServerSideDiff=true
+    argocd.argoproj.io/sync-wave: "-1"
   finalizers:
   - resources-finalizer.argocd.argoproj.io
 spec:
@@ -15,7 +16,7 @@ spec:
   source:
     repoURL: https://operator.min.io
     chart: operator
-    targetRevision: 5.0.13
+    targetRevision: 5.0.14
     helm:
       valuesObject:
         console:

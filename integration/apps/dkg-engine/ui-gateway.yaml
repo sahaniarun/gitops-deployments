@@ -1,21 +1,19 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: metrics-server
+  name: ui-gateway
   namespace: argocd
-  annotations:
-    argocd.argoproj.io/compare-options: ServerSideDiff=true  
   finalizers:
   - resources-finalizer.argocd.argoproj.io
 spec:
   destination:
-    namespace: kube-system
+    namespace: dkg-engine
     server: https://kubernetes.default.svc
   project: default
   source:
-    repoURL: https://github.com/glaciation-heu/gitops-deployments
-    path: integration/apps/metrics-server
-    targetRevision: HEAD
+    repoURL: https://glaciation-heu.github.io/ui_gateway/helm-charts
+    chart: ui-gateway-server
+    targetRevision: 0.*.*
   syncPolicy:
     automated:
      prune: true
@@ -23,3 +21,4 @@ spec:
     syncOptions:
       - CreateNamespace=true
       - ServerSideApply=true
+
