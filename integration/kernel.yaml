@@ -8,7 +8,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/glaciation-heu/gitops-deployments
-    path: integration/apps
+    path: integration/apps/kernel
     targetRevision: HEAD
     directory:
       recurse: true
