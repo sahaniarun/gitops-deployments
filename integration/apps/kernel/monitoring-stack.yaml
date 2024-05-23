@@ -75,6 +75,8 @@ spec:
               enabled: true
             auth:
               signout_redirect_url: /
+            users:
+              viewers_can_edit: true
         kepler:
           enabled: true
 
