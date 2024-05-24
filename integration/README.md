@@ -1,13 +1,14 @@
 # Integration Cluster
 
-## Avalable services
+## Available services
 
-| service | url |
-| ---     | --- |
-| grafana | http://grafana.integration/ |
-| gatekeeper policy manager UI | http://gpm.integration/ |
-| Argo CD | http://argocd.integration/ |
-| MinIO Glaciation Tenant API | http://glaciation-tenant.integration/ |
+| Service                         | URL                                           |
+|---------------------------------|-----------------------------------------------|
+| ArgoCD                          | http://argocd.integration/                    |
+| Gatekeeper Policy Manager UI    | http://gpm.integration/                       |
+| Grafana                         | http://grafana.integration/                   |
+| Metadata service                | http://metadata.integration /                 |
+| MinIO Glaciation Tenant API     | http://glaciation-tenant.integration/         |
 | MinIO Glaciation Tenant Console | http://glaciation-tenant-console.integration/ |
 
 ## DNS workaround
@@ -16,11 +17,12 @@ Our Kubernetes cluster has no DNS server set up yet.
 To override it, add to your host file `/etc/hosts` the following configurations:
 
 ```
-10.14.1.160 grafana.integration 
-10.14.1.160 gpm.integration
 10.14.1.160 argocd.integration
-10.14.1.160 glaciation-tenant.integration
 10.14.1.160 glaciation-tenant-console.integration
+10.14.1.160 glaciation-tenant.integration
+10.14.1.160 gpm.integration
+10.14.1.160 grafana.integration 
+10.14.1.160 metadata.integration
 ```
 
 ## How to install ArgoCD from scratch
