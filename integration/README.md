@@ -11,10 +11,17 @@
 | MinIO Glaciation Tenant API     | http://glaciation-tenant.integration/         |
 | MinIO Glaciation Tenant Console | http://glaciation-tenant-console.integration/ |
 
-## DNS workaround
+
+## How to conect
+
+### VPN
+
+Get a VPN access to the cluster from Dell. There is not direct connectivity without VPN.
+
+### DNS workaround
 
 Our Kubernetes cluster has no DNS server set up yet. 
-To override it, add to your host file `/etc/hosts` the following configurations:
+To override it, add to your file `/etc/hosts` the following configurations:
 
 ```
 10.14.1.160 argocd.integration
