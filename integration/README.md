@@ -21,8 +21,7 @@ Get a VPN access to the cluster from Dell. There is not direct connectivity with
 
 ### DNS workaround
 
-Our Kubernetes cluster has no DNS server set up yet. 
-To override it, add to your file `/etc/hosts` the following configurations:
+Our Kubernetes cluster has no DNS set up yet. To override it, add to your [hosts file](https://en.wikipedia.org/wiki/Hosts_(file)) the following configurations:
 
 ```
 10.14.1.160 argocd.integration
