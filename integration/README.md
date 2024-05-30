@@ -10,6 +10,7 @@
 | Metadata service                | http://metadata.integration /                 |
 | MinIO Glaciation Tenant API     | http://glaciation-tenant.integration/         |
 | MinIO Glaciation Tenant Console | http://glaciation-tenant-console.integration/ |
+| Vault UI                        | https://vault.integration/                    |
 
 
 ## How to conect
@@ -30,6 +31,7 @@ To override it, add to your file `/etc/hosts` the following configurations:
 10.14.1.160 gpm.integration
 10.14.1.160 grafana.integration 
 10.14.1.160 metadata.integration
+10.14.1.160 vault.integration
 ```
 
 ## How to install ArgoCD from scratch
