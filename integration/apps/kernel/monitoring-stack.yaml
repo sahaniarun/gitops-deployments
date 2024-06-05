@@ -20,7 +20,8 @@ spec:
       valuesObject:
         prometheus:
           server:
-            ingress: true
+            ingress: 
+              enabled: true
               hosts:
                 - prometheus.integration
 
