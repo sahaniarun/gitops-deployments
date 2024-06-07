@@ -5,6 +5,7 @@
 | Service                         | URL                                           |
 |---------------------------------|-----------------------------------------------|
 | ArgoCD                          | http://argocd.uc2/                            |
+| Metadata Service                | http://metadata.uc2/                          |
 
 
 ## How to connect
@@ -19,6 +20,7 @@ Our Kubernetes cluster has no DNS set up yet. To override it, add to your [hosts
 
 ```
 10.14.2.5 argocd.uc2
+10.14.2.5 metadata.uc2
 ```
 
 ## Initial configuration

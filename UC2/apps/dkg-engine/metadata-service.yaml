@@ -16,7 +16,7 @@ spec:
     targetRevision: 0.*.*
     helm:
       valuesObject:
-        ingressHostName: metadata.integration
+        ingressHostName: metadata.uc2
   syncPolicy:
     automated:
      prune: true
