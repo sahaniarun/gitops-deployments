@@ -52,10 +52,10 @@ spec:
               ## The HTTPS port on the POD where the Ingress Controller service is running.
               targetPort: 443
 
-          tolerations:
-            - key: "node-role.kubernetes.io/control-plane"
-              operator: "Equal"
-              effect: "NoSchedule"        
+          # tolerations:
+          #   - key: "node-role.kubernetes.io/control-plane"
+          #     operator: "Equal"
+          #     effect: "NoSchedule"        
   syncPolicy:
     automated:
      prune: true
