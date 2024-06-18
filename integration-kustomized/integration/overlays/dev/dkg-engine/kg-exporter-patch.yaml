@@ -1,0 +1,7 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kg-exporter
+spec:
+  source:
+    targetRevision: 0.1.0 # Change this to the version you want to deploy
