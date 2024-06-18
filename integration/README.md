@@ -10,6 +10,7 @@
 | Metadata service                | http://metadata.integration /                 |
 | MinIO Glaciation Tenant API     | http://glaciation-tenant.integration/         |
 | MinIO Glaciation Tenant Console | http://glaciation-tenant-console.integration/ |
+| Prometheus                      | http://prometheus.integration                 |
 | Vault UI                        | https://vault.integration/                    |
 
 
@@ -30,6 +31,7 @@ Our Kubernetes cluster has no DNS set up yet. To override it, add to your [hosts
 10.14.1.160 gpm.integration
 10.14.1.160 grafana.integration 
 10.14.1.160 metadata.integration
+10.14.1.160 prometheus.integration
 10.14.1.160 vault.integration
 ```
 
