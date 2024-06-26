@@ -19,24 +19,7 @@
 
 ### VPN
 
-Get a VPN access to the cluster from Dell. There is no direct connectivity without VPN.
-
-### DNS workaround
-
-Our Kubernetes cluster has no DNS set up yet. To override it, add to your [hosts file](https://en.wikipedia.org/wiki/Hosts_(file)) the following configurations:
-
-```
-10.14.1.160 argocd.integration
-10.14.1.160 data-sanitization.integration
-10.14.1.160 glaciation-tenant-console.integration
-10.14.1.160 glaciation-tenant.integration
-10.14.1.160 gpm.integration
-10.14.1.160 grafana.integration 
-10.14.1.160 metadata.integration
-10.14.1.160 prometheus.integration
-10.14.1.160 spark-history-server.integration
-10.14.1.160 vault.integration
-```
+Get a VPN access to the cluster from Dell. There is no direct connectivity without VPN. DNS server withing VPN network is resolving domain names *.integration to a load-balancer IP address.
 
 ## Initial configuration
 
