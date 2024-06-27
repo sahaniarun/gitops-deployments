@@ -8,7 +8,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/glaciation-heu/gitops-deployments
-    path: integration/apps/security
+    path: UC2/apps/security
     targetRevision: HEAD
     directory:
       recurse: true
