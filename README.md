@@ -6,6 +6,6 @@ At the moment only Integration cluster is defined, but later we may add more clu
 
 The diagram shows how CI/CD works in GLACIATION project.
 
-![image](docs/process_diagram.svg)
+![image](docs/process_diagram.drawio.svg)
 
 A reference example of application repository is [glaciation-metadata-service](https://github.com/glaciation-heu/glaciation-metadata-service).
