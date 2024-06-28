@@ -1,4 +1,4 @@
-# DNS server from VPN
+# DNS server
 
 ## DNS and VPN
 
