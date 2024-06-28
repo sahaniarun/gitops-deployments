@@ -1,5 +1,7 @@
 # DNS server from VPN
 
+## DNS and VPN
+
 When you connect to Dell VPN network, VPN client forces your computer to use DNS server from VPN. 
 DNS server knows all GLACIATION clusters inside VPN and resolves related domain names. 
 If the server does not know some domain name, it delegates the resolution to a global public DNS server.
@@ -7,6 +9,8 @@ If the server does not know some domain name, it delegates the resolution to a g
 A diagram below illustrates basic principles of domain name resolution in our environment. 
 
 ![dns_and_k8s.drawio.svg](dns_and_k8s.drawio.svg)
+
+## How to debug
 
 You can debug domain name resolution with a shell command `nslookup`.
 
