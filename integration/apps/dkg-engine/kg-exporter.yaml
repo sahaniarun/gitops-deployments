@@ -40,7 +40,7 @@ spec:
           prometheus:
             endpoint_port: 8080
           prometheus_client:
-            url: prometheus.integration
+            url: http://monitoring-stack-prometheus-server.monitoring
   syncPolicy:
     automated:
      prune: true
