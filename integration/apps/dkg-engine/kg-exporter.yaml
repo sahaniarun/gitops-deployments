@@ -16,6 +16,20 @@ spec:
     targetRevision: 0.*.*
     helm:
       valuesObject:
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 15
+          periodSeconds: 10
+
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 15
+          periodSeconds: 10
+
         settings:
           builder:
             builder_tick_seconds: 60
