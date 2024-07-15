@@ -16,6 +16,8 @@ spec:
     targetRevision: 0.*.*
     helm:
       valuesObject:
+        ingressHostName: kg-exporter.integration
+
         livenessProbe:
           failureThreshold: 3
           httpGet:
