@@ -17,18 +17,23 @@ spec:
     helm:
       valuesObject:
         livenessProbe:
+          failureThreshold: 3
           httpGet:
             path: /
             port: 8080
+            scheme: HTTP
           initialDelaySeconds: 15
           periodSeconds: 10
+          timeoutSeconds: 5
 
         readinessProbe:
           httpGet:
             path: /
             port: 8080
+            scheme: HTTP
           initialDelaySeconds: 15
           periodSeconds: 10
+          timeoutSeconds: 5
 
         settings:
           builder:
