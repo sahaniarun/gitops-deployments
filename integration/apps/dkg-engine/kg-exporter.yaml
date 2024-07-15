@@ -17,7 +17,30 @@ spec:
     helm:
       valuesObject:
         settings:
-          metadata_service_url: "http://metadata-service/api/v0/graph"
+          builder:
+            builder_tick_seconds: 60
+            node_port: 80
+            single_slice_url: http://metadata-service:80
+            is_single_slice: False
+            queries:
+              node_queries:
+                - measurement_id: Energy
+                  subresource: Energy
+                  source: Kepler
+                  unit: milliwatts
+                  property: Energy.Usage
+                  query: label_replace(kepler_node_platform_joules_total, "resource", "$1", "exported_instance", "(.+)")
+                  result_parser: PROMETHEUS_PARSER
+
+              pod_queries: []
+          k8s:
+            in_cluster: true
+          metadata:
+            metadata_service_url: metadata-service
+          prometheus:
+            endpoint_port: 8080
+          prometheus_client:
+            url: prometheus.integration
   syncPolicy:
     automated:
      prune: true
