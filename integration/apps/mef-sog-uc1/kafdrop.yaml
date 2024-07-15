@@ -6,9 +6,22 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: 'https://github.com/glaciation-heu/mef-sog-uc1/'
-    path: kafdrop
-    targetRevision: HEAD
+    repoURL: 'https://glaciation-heu.github.io/mef-sog-uc1/'
+    targetRevision: 0.1.0
+    helm:
+      values: |
+        server:
+          port: 9000
+          servlet:
+            contextPath: /kafdrop
+        service:
+          annotations: {}
+          type: NodePort
+          port: 9000
+          nodePort: 30010
+        kafka:
+          brokerConnect: kafka.kafka.svc.cluster.local:9092
+    chart: kafdrop
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: kafdrop
