@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: mef-sog-uc1-wl
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: 'https://glaciation-heu.github.io/mef-sog-uc1/'
+    targetRevision: 1.0.0
+    chart: mef-sog-uc1-wl
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: mef-sog-uc1-wl
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
