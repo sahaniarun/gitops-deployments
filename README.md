@@ -26,8 +26,9 @@ A reference example of application repository is [glaciation-metadata-service](h
       ```
    3. Use *.yaml as App-of-Apps configurations.
 
-1. Install load balancer. Check [load-balancer](docs/load-balancer/load-balancer.md) for more details.
+2. Install load balancer. Check [load-balancer](docs/load-balancer/load-balancer.md) for more details.
 
-1. Set up DNS server. Check [dns-server](docs/dns-server/node-configuration.md) for more details.
+3. Set up DNS server. Check [dns-server](docs/dns-server/node-configuration.md) for more details.
 
+4. Setup worker [nodes](docs/worker/setup.md)
 
