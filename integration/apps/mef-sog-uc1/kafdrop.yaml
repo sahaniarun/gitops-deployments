@@ -11,14 +11,12 @@ spec:
     helm:
       values: |
         server:
-          port: 9000
           servlet:
             contextPath: /kafdrop
         service:
           annotations: {}
-          type: NodePort
-          port: 9000
-          nodePort: 30010
+          type: ClusterIP
+          port: 80
         kafka:
           brokerConnect: kafka.kafka.svc.cluster.local:9092
     chart: kafdrop
