@@ -7,13 +7,15 @@ spec:
   project: default
   source:
     repoURL: 'https://glaciation-heu.github.io/mef-sog-uc1/'
-    targetRevision: 1.0.4
+    targetRevision: 1.0.5
     helm:
       values: |
         scheduledClient:
           service:
             type: ClusterIP
             port: 80
+        elaborationTimbMs:
+          logLevelJpa: true
     chart: mef-sog-uc1-wl
   destination:
     server: 'https://kubernetes.default.svc'
