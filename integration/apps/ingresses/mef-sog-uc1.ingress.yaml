@@ -14,5 +14,5 @@ spec:
                 name: scheduled-client-entrypoint
                 port:
                   number: 80
-            path: /scheduled-client/
+            path: /
             pathType: Prefix
