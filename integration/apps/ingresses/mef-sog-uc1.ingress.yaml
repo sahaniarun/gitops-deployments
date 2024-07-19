@@ -4,8 +4,10 @@ metadata:
   name: mef-sog-uc1-ingress
   namespace: mef-sog-uc1-wl
   annotations:
-    nginx.org/client-max-body-size: "4096m"
-    nginx.ingress.kubernetes.io/proxy-body-size: "4096m"
+#    nginx.org/proxy-connect-timeout: "60s"
+#    nginx.org/proxy-read-timeout: "60s"
+    nginx.org/client-max-body-size: "0"
+#    nginx.ingress.kubernetes.io/proxy-body-size: "0"
 spec:
   ingressClassName: nginx
   rules:
