@@ -44,6 +44,7 @@ spec:
             # NOTE: To make sure the certificate is trusted by clients we should use
             # something like Let's Encrypt
             cert-manager.io/cluster-issuer: "private-ca-issuer"
+            nginx.ingress.kubernetes.io/ssl-redirect: "false"
           hosts:
           - host: spark-history-server.integration
             paths:
