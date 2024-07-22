@@ -39,7 +39,7 @@ spec:
         volumeMounts:
         - mountPath: /tmp/config.env
           subPath: config.env
-          name: glaciation-env-configuration
+          name: configuration
           readOnly: true
         - mountPath: /etc/ssl/certs/ca.crt
           subPath: ca.crt
@@ -55,4 +55,10 @@ spec:
         configMap:
           defaultMode: 422
           name: ca-bundle
+      - name: configuration
+        projected:
+          defaultMode: 420
+          sources:
+          - secret:
+              name: glaciation-env-configuration          
   backoffLimit: 5
