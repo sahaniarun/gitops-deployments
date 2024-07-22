@@ -130,15 +130,14 @@ spec:
             enabled: true
             ingressClassName: "nginx"
             annotations:
-              # NOTE: To make sure the certificate is trusted by clients we should use
-              # something like Let's Encrypt
-              cert-manager.io/cluster-issuer: "private-ca-issuer"
+            #   # NOTE: To make sure the certificate is trusted by clients we should use
+            #   # something like Let's Encrypt
+            #   cert-manager.io/cluster-issuer: "private-ca-issuer"
               nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
-              nginx.ingress.kubernetes.io/ssl-redirect: "false"
-            tls:
-            - hosts:
-              - glaciation-tenant.integration
-              secretName: minio-tenant-ingress
+            # tls:
+            # - hosts:
+            #   - glaciation-tenant.integration
+            #   secretName: minio-tenant-ingress
             host: glaciation-tenant.integration
             path: /
             pathType: Prefix
@@ -146,15 +145,14 @@ spec:
             enabled: true
             ingressClassName: "nginx"
             annotations:
-              # NOTE: To make sure the certificate is trusted by clients we should use
-              # something like Let's Encrypt
-              cert-manager.io/cluster-issuer: "private-ca-issuer"
+            #   # NOTE: To make sure the certificate is trusted by clients we should use
+            #   # something like Let's Encrypt
+            #   cert-manager.io/cluster-issuer: "private-ca-issuer"
               nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
-              nginx.ingress.kubernetes.io/ssl-redirect: "false"
-            tls:
-            - hosts:
-              - glaciation-tenant-console.integration
-              secretName: minio-tenant-console-ingress
+            # tls:
+            # - hosts:
+            #   - glaciation-tenant-console.integration
+            #   secretName: minio-tenant-console-ingress
             host: glaciation-tenant-console.integration
             path: /
             pathType: Prefix
