@@ -23,7 +23,6 @@ jobs:
             kustomize_build_dir: 'overlays/integration-base-test'
             kustomize_comment: true
             kustomize_output_file: "bundle/rendered.yaml"
-            kustomize_build_options: "--load_restrictor none"
             token: ${{ github.token}}
           env:
             GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_ACCESS_TOKEN }}
