@@ -15,7 +15,7 @@ jobs:
         - name: Checkout
           uses: actions/checkout@v4
           with:
-            ref: ${{ github.event.before }}
+            ref: 'Kustomized-deployments'
         - name: Kustomize Build
           uses: karancode/kustomize-github-action@master
           with:
