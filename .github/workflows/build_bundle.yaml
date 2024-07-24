@@ -3,6 +3,10 @@ on:
     push:
         branches:
         - 'Kustomized-deployments'
+        paths: 
+            - .github/**
+            - overlays/**
+            - base/**
 
 jobs:
     kustomize:
