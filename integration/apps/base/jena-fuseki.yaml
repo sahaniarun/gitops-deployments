@@ -17,8 +17,6 @@ spec:
     helm:
       valuesObject:
         ingressHostName: jena-fuseki.integration
-  strategy:
-    type: Recreate
   syncPolicy:
     automated:
      prune: true
