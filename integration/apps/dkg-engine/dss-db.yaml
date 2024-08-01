@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: data-storage-service-DB
+  name: data-storage-service-db
   namespace: argocd
   finalizers:
   - resources-finalizer.argocd.argoproj.io
