@@ -517,7 +517,9 @@ spec:
       - forceString: true
         name: installCRDs
         value: "true"
-      values: 'installCRDs: true'
+      values: |-
+        cert-manager:
+          installCRDs: true
     repoURL: https://charts.jetstack.io
     targetRevision: v1.14.5
   syncPolicy:
