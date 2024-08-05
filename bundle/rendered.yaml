@@ -601,6 +601,17 @@ spec:
   project: default
   source:
     chart: gatekeeper
+    helm:
+      values: |-
+        postInstall:
+          labelNamespace:
+            extraRules:
+            - apiGroups:
+              - management.cattle.io
+              resources:
+              - projects
+              verbs:
+              - updatepsa
     repoURL: https://open-policy-agent.github.io/gatekeeper/charts
     targetRevision: 3.15.1
   syncPolicy:
