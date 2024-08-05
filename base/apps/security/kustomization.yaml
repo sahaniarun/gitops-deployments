@@ -8,4 +8,4 @@ resources:
   - vault.yaml
   - gatekeeper-policy-manager.yaml
   - replicator.yaml
-  
+  - ./manual/vault-init.yaml
