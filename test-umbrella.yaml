@@ -9,7 +9,7 @@ spec:
   source:
     repoURL: https://github.com/Shockedshodan/gitops-deployments
     path: bundle
-    targetRevision: Kustomized-deployments/HEAD
+    targetRevision: Kustomized-deployments
     directory:
       recurse: true
   destination:
