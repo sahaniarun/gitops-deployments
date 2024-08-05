@@ -615,6 +615,143 @@ spec:
     syncOptions:
     - ServerSideApply=true
 ---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+  name: init-vault-cluster
+  namespace: vault
+spec:
+  backoffLimit: 5
+  template:
+    spec:
+      containers:
+      - command:
+        - /bin/sh
+        - -c
+        - |
+          set -e # make sure the job fails if any instruction fails
+
+          function unseal {
+              head -n $THRESHOLD /vault/cluster-keys |
+              while read line; do
+                vault operator unseal \
+                  -address=https://$1.vault-internal:8200 \
+                  $line;
+              done
+          }
+
+          echo '[*] Initialize HA Vault cluster'
+          # Wait for the startup of the Vault pods
+          sleep 30 # it does the job without requiring to create an ad hoc image
+          # TODO: Persist PGP encrypted Vault unseal keys somewhere outside the cluster
+          vault operator init \
+            -address=https://vault-0.vault-internal:8200 \
+            -key-shares=$SHARES \
+            -key-threshold=$THRESHOLD \
+            -format=json > /vault/response.json
+          # Extract unseal keys from the JSON response
+          awk '/"unseal_keys_b64": \[/{flag=1;next}/\]/{flag=0}flag' /vault/response.json | sed -n 's/\s*"\(.*\)".*/\1/p' > /vault/cluster-keys
+          unseal vault-0
+          vault operator raft join \
+            -address=https://vault-1.vault-internal:8200 \
+            -leader-ca-cert="$(cat /vault/userconfig/vault-tls/ca.crt)" \
+            -leader-client-cert="$(cat /vault/userconfig/vault-tls/tls.crt)" \
+            -leader-client-key="$(cat /vault/userconfig/vault-tls/tls.key)" \
+            https://vault-0.vault-internal:8200
+          unseal vault-1
+          vault operator raft join \
+            -address=https://vault-2.vault-internal:8200 \
+            -leader-ca-cert="$(cat /vault/userconfig/vault-tls/ca.crt)" \
+            -leader-client-cert="$(cat /vault/userconfig/vault-tls/tls.crt)" \
+            -leader-client-key="$(cat /vault/userconfig/vault-tls/tls.key)" \
+            https://vault-0.vault-internal:8200
+          unseal vault-2
+          echo -e '\n[*] Setup HA Vault cluster for integration with MinIO'
+          VAULT_ROOT_TOKEN=$(sed -n 's/\s*"root_token": "\(.*\)".*/\1/p' /vault/response.json)
+          vault login \
+            -address=https://vault-0.vault-internal:8200 \
+            $VAULT_ROOT_TOKEN
+          vault secrets enable \
+            -address=https://vault-0.vault-internal:8200 \
+            -version=2 \
+            kv
+          vault policy write \
+            -address=https://vault-0.vault-internal:8200 \
+            kes-policy /minio/kes/kes-policy.hcl
+          vault auth enable \
+            -address=https://vault-0.vault-internal:8200 \
+            kubernetes
+          vault write \
+            -address=https://vault-0.vault-internal:8200 \
+            auth/kubernetes/config \
+            token_reviewer_jwt="$(cat /minio/kes/service-account/token)" \
+            kubernetes_host="https://kubernetes.default.svc.cluster.local" \
+            kubernetes_ca_cert="$(cat /minio/kes/service-account/ca.crt)" \
+            issuer="https://kubernetes.default.svc.cluster.local"
+          vault write \
+            -address=https://vault-0.vault-internal:8200 \
+            auth/kubernetes/role/minio-kes \
+            bound_service_account_names=minio-kes \
+            bound_service_account_namespaces=minio-tenant \
+            policies=kes-policy \
+            ttl=1h
+        env:
+        - name: SHARES
+          value: "5"
+        - name: THRESHOLD
+          value: "3"
+        image: hashicorp/vault:1.16.1
+        name: vault
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          privileged: false
+          runAsGroup: 1000
+          runAsUser: 100
+        volumeMounts:
+        - mountPath: /etc/ssl/certs/ca.crt
+          name: ca-bundle
+          readOnly: true
+          subPath: ca.crt
+        - mountPath: /vault/userconfig/vault-tls
+          name: userconfig-vault-tls
+          readOnly: true
+        - mountPath: /minio/kes/service-account
+          name: minio-kes-service-account-token
+          readOnly: true
+        - mountPath: /minio/kes/kes-policy.hcl
+          name: kes-policy
+          readOnly: true
+          subPath: kes-policy.hcl
+      restartPolicy: Never
+      securityContext:
+        runAsGroup: 1000
+        runAsNonRoot: true
+        runAsUser: 100
+        seccompProfile:
+          type: RuntimeDefault
+      volumes:
+      - configMap:
+          defaultMode: 422
+          name: ca-bundle
+        name: ca-bundle
+      - name: userconfig-vault-tls
+        secret:
+          defaultMode: 420
+          secretName: vault-tls
+      - name: minio-kes-service-account-token
+        secret:
+          defaultMode: 420
+          secretName: minio-kes-secret
+      - configMap:
+          defaultMode: 420
+          name: kes-policy
+        name: kes-policy
+---
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
