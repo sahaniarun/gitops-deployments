@@ -1,0 +1,90 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: decision-engine-ingress
+  annotations:
+    kubernetes.io/ingress.class: nginx  
+spec:
+  rules:
+  - host: decision-engine.integration
+    http:
+      paths:
+      - path: /generate_data
+        pathType: Prefix
+        backend:
+          service:
+            name: idmgdb
+            port:
+              number: 8080
+      - path: /generate_graph
+        backend:
+          service:
+            name: idmgdb
+            port:
+              number: 8080
+      - path: /get_graph_data_wn
+        backend:
+          service:
+            name: idmgdb
+            port:
+              number: 8080
+      - path: /get_graph_data_wl
+        backend:
+          service:
+            name: idmgdb
+            port:
+              number: 8080
+      - path: /get_timeseries_graph_data_wn
+        backend:
+          service:
+            name: idmgdb
+            port:
+              number: 8080
+      - path: /get_timeseries_graph_data_wl
+        backend:
+          service:
+            name: idmgdb
+            port:
+              number: 8080
+      - path: /display
+        backend:
+          service:
+            name: idmgdc
+            port:
+              number: 8080
+      - path: /download
+        backend:
+          service:
+            name: idmgdc
+            port:
+              number: 8080
+      - path: /generate
+        backend:
+          service:
+            name: idmgdc
+            port:
+              number: 8080
+      - path: /get-response-data-json
+        backend:
+          service:
+            name: idmgpl
+            port:
+              number: 8080
+      - path: /get-response-data-xlsx
+        backend:
+          service:
+            name: idmgpl
+            port:
+              number: 8080
+      - path: /get-scores
+        backend:
+          service:
+            name: idmgpl
+            port:
+              number: 8080
+      - path: /update-config
+        backend:
+          service:
+            name: idmgpl
+            port:
+              number: 8080
