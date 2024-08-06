@@ -11,9 +11,6 @@ spec:
     repoURL: https://idmg-pub.gitlab.io/helm-charts/
     chart: cf
     targetRevision: 0.*.*
-    helm:
-      # valuesObject:
-      #   ingressHostName: uc2-workload.integration
   destination:
     namespace: idmg
     server: https://kubernetes.default.svc
