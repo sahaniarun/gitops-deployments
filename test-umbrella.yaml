@@ -7,7 +7,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/Shockedshodan/gitops-deployments
+    repoURL: https://github.com/glaciation-heu/gitops-deployments
     path: bundle
     targetRevision: Kustomized-deployments
     directory:
