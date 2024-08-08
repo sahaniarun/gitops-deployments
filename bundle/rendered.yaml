@@ -3,14 +3,15 @@ kind: Namespace
 metadata:
   annotations:
     argocd.argoproj.io/hook: PreSync
-    argocd.argoproj.io/sync-wave: "-1"
+    argocd.argoproj.io/sync-wave: "-10"
   name: local-path-storage
 ---
 apiVersion: v1
 kind: Namespace
 metadata:
   annotations:
-    argocd.argoproj.io/sync-wave: "-1"
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/sync-wave: "-8"
   labels:
     create-ca-bundle: "true"
   name: minio-tenant
@@ -18,8 +19,16 @@ metadata:
 apiVersion: v1
 kind: Namespace
 metadata:
+  labels:
+    create-ca-bundle: "true"
+  name: spark-app
+---
+apiVersion: v1
+kind: Namespace
+metadata:
   annotations:
-    argocd.argoproj.io/sync-wave: "-1"
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/sync-wave: "-7"
   labels:
     create-ca-bundle: "true"
   name: vault
@@ -28,11 +37,21 @@ apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   annotations:
-    argocd.argoproj.io/sync-wave: "-1"
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/sync-wave: "-10"
   name: local-path
 provisioner: rancher.io/local-path
 reclaimPolicy: Delete
 volumeBindingMode: WaitForFirstConsumer
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+  name: gatekeeper-smoke-test
+  namespace: gatekeeper-system
 ---
 apiVersion: v1
 kind: ServiceAccount
@@ -47,7 +66,7 @@ kind: ServiceAccount
 metadata:
   annotations:
     argocd.argoproj.io/hook: PreSync
-    argocd.argoproj.io/sync-wave: "-1"
+    argocd.argoproj.io/sync-wave: "-10"
   name: local-path-provisioner-service-account
   namespace: local-path-storage
 ---
@@ -55,7 +74,8 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   annotations:
-    argocd.argoproj.io/sync-wave: "-1"
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/sync-wave: "-8"
   name: minio-kes
   namespace: minio-tenant
 ---
@@ -63,7 +83,8 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   annotations:
-    argocd.argoproj.io/sync-wave: "-1"
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/sync-wave: "-10"
   name: local-path-provisioner-role
   namespace: local-path-storage
 rules:
@@ -84,7 +105,38 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   annotations:
-    argocd.argoproj.io/sync-wave: "-1"
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+  name: gatekeeper-smoke-test
+rules:
+- apiGroups:
+  - templates.gatekeeper.sh
+  resources:
+  - constrainttemplates
+  verbs:
+  - create
+  - delete
+- apiGroups:
+  - constraints.gatekeeper.sh
+  resources:
+  - k8sallowedrepos
+  verbs:
+  - create
+  - delete
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - create
+  - delete
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/sync-wave: "-10"
   name: local-path-provisioner-role
 rules:
 - apiGroups:
@@ -190,7 +242,8 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   annotations:
-    argocd.argoproj.io/sync-wave: "-1"
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/sync-wave: "-10"
   name: local-path-provisioner-bind
   namespace: local-path-storage
 roleRef:
@@ -206,7 +259,8 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   annotations:
-    argocd.argoproj.io/sync-wave: "-1"
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/sync-wave: "-8"
   name: role-tokenreview-binding
   namespace: minio-tenant
 roleRef:
@@ -222,7 +276,24 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   annotations:
-    argocd.argoproj.io/sync-wave: "-1"
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+  name: gatekeeper-smoke-test
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: gatekeeper-smoke-test
+subjects:
+- kind: ServiceAccount
+  name: gatekeeper-smoke-test
+  namespace: gatekeeper-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/sync-wave: "-10"
   name: local-path-provisioner-bind
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -300,7 +371,8 @@ data:
 kind: ConfigMap
 metadata:
   annotations:
-    argocd.argoproj.io/sync-wave: "-1"
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/sync-wave: "-10"
   name: local-path-config
   namespace: local-path-storage
 ---
@@ -316,7 +388,8 @@ data:
 kind: ConfigMap
 metadata:
   annotations:
-    argocd.argoproj.io/sync-wave: "-1"
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/sync-wave: "-7"
   name: kes-policy
   namespace: vault
 ---
@@ -324,7 +397,8 @@ apiVersion: v1
 kind: Secret
 metadata:
   annotations:
-    argocd.argoproj.io/sync-wave: "-1"
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/sync-wave: "-8"
     kubernetes.io/service-account.name: minio-kes
     replicator.v1.mittwald.de/replication-allowed: "true"
     replicator.v1.mittwald.de/replication-allowed-namespaces: vault
@@ -337,7 +411,8 @@ data: {}
 kind: Secret
 metadata:
   annotations:
-    argocd.argoproj.io/sync-wave: "-1"
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/sync-wave: "-7"
     replicator.v1.mittwald.de/replicate-from: minio-tenant/minio-kes-secret
   name: minio-kes-secret
   namespace: vault
@@ -436,7 +511,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    argocd.argoproj.io/sync-wave: "-1"
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/sync-wave: "-9"
   name: local-path-provisioner
   namespace: local-path-storage
 spec:
@@ -493,7 +569,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   annotations:
-    argocd.argoproj.io/sync-wave: "-9"
+    argocd.argoproj.io/sync-wave: "-6"
   finalizers:
   - resources-finalizer.argocd.argoproj.io
   name: cert-manager
@@ -526,8 +602,66 @@ spec:
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+  name: data-sanitization
+  namespace: argocd
+spec:
+  destination:
+    namespace: spark-app
+    server: https://kubernetes.default.svc
+  project: default
+  sources:
+  - chart: data-sanitization
+    helm:
+      valuesObject:
+        ingress:
+          className: nginx
+          enabled: true
+          hosts:
+          - host: data-sanitization.integration
+            paths:
+            - path: /
+              pathType: Prefix
+        resources:
+          limits:
+            cpu: 500m
+            memory: 1024Mi
+          requests:
+            cpu: 250m
+            memory: 512Mi
+        s3:
+          accessKeyId: minio
+          certificate: /etc/ssl/certs/ca.crt
+          endpoint: minio.minio-tenant.svc.cluster.local
+          secretAccessKey: minio123
+        secret:
+          create: true
+          name: minio-credentials
+        volumeMounts:
+        - mountPath: /etc/ssl/certs/ca.crt
+          name: ca-bundle
+          readOnly: true
+          subPath: ca.crt
+        volumes:
+        - configMap:
+            defaultMode: 422
+            name: ca-bundle
+          name: ca-bundle
+    repoURL: https://glaciation-heu.github.io/data-sanitization-service
+    targetRevision: 0.2.2
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - ServerSideApply=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
   annotations:
-    argocd.argoproj.io/sync-wave: "-10"
+    argocd.argoproj.io/sync-wave: "-6"
   finalizers:
   - resources-finalizer.argocd.argoproj.io
   name: gatekeeper
@@ -601,6 +735,30 @@ kind: Application
 metadata:
   finalizers:
   - resources-finalizer.argocd.argoproj.io
+  name: idmg-decision-engine
+  namespace: argocd
+spec:
+  destination:
+    namespace: idmg
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: cf
+    repoURL: https://idmg-pub.gitlab.io/helm-charts/
+    targetRevision: 0.*.*
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+    - ServerSideApply=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
   name: jena-fuseki
   namespace: argocd
 spec:
@@ -615,6 +773,131 @@ spec:
         ingressHostName: jena-fuseki.integration
     repoURL: https://glaciation-heu.github.io/jena-fuseki/helm-charts/
     targetRevision: 1.*.*
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+    - ServerSideApply=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kafdrop
+  namespace: argocd
+spec:
+  destination:
+    namespace: kafdrop
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: kafdrop
+    helm:
+      values: |
+        server:
+          servlet:
+            contextPath: /kafdrop
+        service:
+          annotations: {}
+          type: ClusterIP
+          port: 80
+        kafka:
+          brokerConnect: kafka.kafka.svc.cluster.local:9092
+    repoURL: https://glaciation-heu.github.io/mef-sog-uc1/
+    targetRevision: 0.1.0
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+    - ServerSideApply=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kafka
+  namespace: argocd
+spec:
+  destination:
+    namespace: kafka
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: kafka
+    helm:
+      values: |
+        image:
+          tag: 3.5.1-debian-11-r25
+          pullPolicy: Always
+
+        kraft:
+          enabled: false
+
+        auth:
+          interBrokerProtocol: plaintext
+
+        broker:
+          replicaCount: 3
+          podAntiAffinityPreset: hard
+          persistence:
+            enabled: true
+            storageClass: longhorn
+            accessModes:
+              - ReadWriteOnce
+            size: 2Gi
+
+        controller:
+          replicaCount: 0
+
+        zookeeper:
+          enabled: true
+          replicaCount: 3
+          podAntiAffinityPreset: hard
+          persistence:
+            enabled: true
+            storageClass: longhorn
+            accessModes:
+              - ReadWriteOnce
+            size: 5Gi
+
+        listeners:
+          client:
+            protocol: plaintext
+
+          interbroker:
+            protocol: plaintext
+
+          external:
+            protocol: plaintext
+
+        externalAccess:
+          enabled: false
+    repoURL: https://glaciation-heu.github.io/mef-sog-uc1/
+    targetRevision: 28.0.4
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+    - ServerSideApply=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: keda
+  namespace: argocd
+spec:
+  destination:
+    namespace: keda
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: keda
+    repoURL: https://kedacore.github.io/charts
+    targetRevision: 2.14.0
   syncPolicy:
     automated:
       prune: true
@@ -652,9 +935,39 @@ spec:
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
+  name: mef-sog-uc1-wl
+  namespace: argocd
+spec:
+  destination:
+    namespace: mef-sog-uc1-wl
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: mef-sog-uc1-wl
+    helm:
+      values: |
+        scheduledClient:
+          service:
+            type: ClusterIP
+            port: 80
+        elaborationTimbMs:
+          logLevelJpa: true
+    repoURL: https://glaciation-heu.github.io/mef-sog-uc1/
+    targetRevision: 1.*.*
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+    - ServerSideApply=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
   annotations:
     argocd.argoproj.io/compare-options: ServerSideDiff=true
-    argocd.argoproj.io/sync-wave: "-1"
+    argocd.argoproj.io/sync-wave: "-7"
   finalizers:
   - resources-finalizer.argocd.argoproj.io
   name: minio
@@ -914,6 +1227,42 @@ kind: Application
 metadata:
   finalizers:
   - resources-finalizer.argocd.argoproj.io
+  name: neo4j
+  namespace: argocd
+spec:
+  destination:
+    namespace: idmg
+    server: https://kubernetes.default.svc
+  project: default
+  sources:
+  - chart: neo4j
+    helm:
+      valuesObject:
+        neo4j:
+          name: idmg
+          password: password
+        services:
+          neo4j:
+            spec:
+              type: ClusterIP
+        volumes:
+          data:
+            mode: defaultStorageClass
+    repoURL: https://neo4j.github.io/helm-charts/
+    targetRevision: 5.21.2
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+    - ServerSideApply=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
   name: nginx
   namespace: argocd
 spec:
@@ -962,7 +1311,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   annotations:
-    argocd.argoproj.io/sync-wave: "-9"
+    argocd.argoproj.io/sync-wave: "-6"
   finalizers:
   - resources-finalizer.argocd.argoproj.io
   name: replicator
@@ -987,8 +1336,125 @@ spec:
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+  name: semantification-service
+  namespace: argocd
+spec:
+  destination:
+    namespace: semantification
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: semantification-service
+    helm:
+      valuesObject:
+        ingressHostName: semantification.integration
+    repoURL: https://glaciation-heu.github.io/glaciation-semantification-service/helm-charts/
+    targetRevision: 0.*.*
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+    - ServerSideApply=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+  name: spark-history-server
+  namespace: argocd
+spec:
+  destination:
+    namespace: spark-app
+    server: https://kubernetes.default.svc
+  project: default
+  sources:
+  - chart: spark-history-server
+    helm:
+      valuesObject:
+        ingress:
+          className: nginx
+          enabled: true
+          hosts:
+          - host: spark-history-server.integration
+            paths:
+            - path: /
+              pathType: Prefix
+        resources:
+          limits:
+            cpu: 500m
+            memory: 1024Mi
+          requests:
+            cpu: 250m
+            memory: 512Mi
+        s3:
+          bucket: sanitization/spark-events
+          endpoint: minio.minio-tenant.svc.cluster.local
+        secret:
+          create: false
+          name: minio-credentials
+        volumeMounts:
+        - mountPath: /etc/ssl/certs/ca.crt
+          name: ca
+          readOnly: true
+          subPath: ca.crt
+        - mountPath: /opt/java/openjdk/lib/security/cacerts
+          name: ca
+          readOnly: true
+          subPath: ca.jks
+        volumes:
+        - configMap:
+            defaultMode: 422
+            name: ca-bundle
+          name: ca
+    repoURL: https://glaciation-heu.github.io/spark-history-server
+    targetRevision: 1.0.3
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - ServerSideApply=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+  name: spark-operator
+  namespace: argocd
+spec:
+  destination:
+    namespace: spark-operator
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: spark-operator
+    helm:
+      valuesObject:
+        sparkJobNamespaces:
+        - spark-app
+        webhook:
+          enable: true
+    repoURL: https://kubeflow.github.io/spark-operator/
+    targetRevision: 1.2.14
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+    - ServerSideApply=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
   annotations:
-    argocd.argoproj.io/sync-wave: "-9"
+    argocd.argoproj.io/sync-wave: "-6"
   finalizers:
   - resources-finalizer.argocd.argoproj.io
   name: trust-manager
@@ -1021,9 +1487,36 @@ spec:
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+  name: uc2-workload-service
+  namespace: argocd
+spec:
+  destination:
+    namespace: uc2
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: uc2-workload
+    helm:
+      valuesObject:
+        ingressHostName: uc2-workload.integration
+    repoURL: https://glaciation-heu.github.io/glaciation-uc2-workload-service/helm-charts/
+    targetRevision: 0.*.*
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+    - ServerSideApply=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
   annotations:
     argocd.argoproj.io/compare-options: ServerSideDiff=true
-    argocd.argoproj.io/sync-wave: "-1"
+    argocd.argoproj.io/sync-wave: "-6"
   finalizers:
   - resources-finalizer.argocd.argoproj.io
   name: vault
@@ -1127,7 +1620,139 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   annotations:
-    argocd.argoproj.io/sync-wave: "-1"
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+  name: gatekeeper-smoke-test
+  namespace: gatekeeper-system
+spec:
+  backoffLimit: 5
+  template:
+    spec:
+      containers:
+      - command:
+        - /bin/sh
+        - -c
+        - |
+          # Check status of the Gatekeeper service
+          (
+            set -e; # make sure the job fails if any instruction fails
+
+            # Some of the following commands are meant to fail to prove the
+            # successful enforcement of the policy. With the suffix '&& exit 1'
+            # we force to exit with an error status whenever these commands are
+            # executed successfully.
+            # NOTE: This is not the same as the ! operator.
+
+            kubectl create -f https://raw.githubusercontent.com/unibg-seclab/glaciation-gitops-test/main/resources/template.yaml;
+            kubectl create -f https://raw.githubusercontent.com/unibg-seclab/glaciation-gitops-test/main/resources/constraint.yaml;
+            kubectl create -f https://raw.githubusercontent.com/unibg-seclab/glaciation-gitops-test/main/resources/example_allowed.yaml -n default;
+            kubectl create -f https://raw.githubusercontent.com/unibg-seclab/glaciation-gitops-test/main/resources/example_disallowed_container.yaml -n default && exit 1;
+            kubectl create -f https://raw.githubusercontent.com/unibg-seclab/glaciation-gitops-test/main/resources/example_disallowed_initcontainer.yaml -n default && exit 1;
+            kubectl create -f https://raw.githubusercontent.com/unibg-seclab/glaciation-gitops-test/main/resources/example_disallowed_both.yaml -n default && exit 1;
+
+            # Overwrite last command exit status with success. Indeed, if we
+            # get here the test has succeeded
+            exit 0
+          )
+
+          # Store exit status of the subshell (i.e., state of the test)
+          exit_code=$?
+
+          # Restore cluster in a clean state (these always run even in case of errors above)
+          kubectl delete -f https://raw.githubusercontent.com/unibg-seclab/glaciation-gitops-test/main/resources/example_allowed.yaml -n default;
+          kubectl delete -f https://raw.githubusercontent.com/unibg-seclab/glaciation-gitops-test/main/resources/example_disallowed_container.yaml -n default;
+          kubectl delete -f https://raw.githubusercontent.com/unibg-seclab/glaciation-gitops-test/main/resources/example_disallowed_initcontainer.yaml -n default;
+          kubectl delete -f https://raw.githubusercontent.com/unibg-seclab/glaciation-gitops-test/main/resources/example_disallowed_both.yaml -n default;
+          kubectl delete -f https://raw.githubusercontent.com/unibg-seclab/glaciation-gitops-test/main/resources/constraint.yaml;
+          kubectl delete -f https://raw.githubusercontent.com/unibg-seclab/glaciation-gitops-test/main/resources/template.yaml
+
+          # Return the state of smoke test
+          exit $exit_code
+        image: bitnami/kubectl:1.30
+        name: kubectl
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          privileged: false
+      restartPolicy: Never
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      serviceAccountName: gatekeeper-smoke-test
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+  name: minio-smoke-tests
+  namespace: minio-tenant
+spec:
+  backoffLimit: 5
+  template:
+    spec:
+      containers:
+      - command:
+        - /bin/sh
+        - -c
+        - |
+          set -e # make sure the job fails if any instruction fails
+
+          source /tmp/config.env;
+          set -x;  # enable printing the command before execution (in the sub-shell)
+          mc alias set minio https://minio.minio-tenant.svc.cluster.local $MINIO_ROOT_USER $MINIO_ROOT_PASSWORD;
+          mc mb -p minio/test-encrypted-bucket;
+          mc encrypt set sse-kms encryption-key minio/test-encrypted-bucket;
+          mc ls minio;
+          echo "This is a line of text" > /tmp/test-object;
+          mc mv /tmp/test-object minio/test-encrypted-bucket;
+          mc ls minio/test-encrypted-bucket;
+          mc cat minio/test-encrypted-bucket/test-object
+        image: quay.io/minio/minio:RELEASE.2024-03-15T01-07-19Z
+        name: minio-client
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          privileged: false
+          runAsGroup: 1000
+          runAsUser: 1000
+        volumeMounts:
+        - mountPath: /tmp/config.env
+          name: configuration
+          readOnly: true
+          subPath: config.env
+        - mountPath: /etc/ssl/certs/ca.crt
+          name: ca-bundle
+          readOnly: true
+          subPath: ca.crt
+      restartPolicy: Never
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      volumes:
+      - configMap:
+          defaultMode: 422
+          name: ca-bundle
+        name: ca-bundle
+      - name: configuration
+        projected:
+          defaultMode: 420
+          sources:
+          - secret:
+              name: glaciation-env-configuration
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "-6"
   name: init-vault-cluster
   namespace: vault
 spec:
@@ -1264,8 +1889,9 @@ apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   annotations:
+    argocd.argoproj.io/hook: PreSync
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
-    argocd.argoproj.io/sync-wave: "-9"
+    argocd.argoproj.io/sync-wave: "-7"
   name: my-selfsigned-ca
   namespace: cert-manager
 spec:
@@ -1284,8 +1910,9 @@ apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   annotations:
+    argocd.argoproj.io/hook: PreSync
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
-    argocd.argoproj.io/sync-wave: "-1"
+    argocd.argoproj.io/sync-wave: "-7"
   name: vault-certificate
   namespace: vault
 spec:
@@ -1323,8 +1950,9 @@ apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
   annotations:
+    argocd.argoproj.io/hook: PreSync
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
-    argocd.argoproj.io/sync-wave: "-9"
+    argocd.argoproj.io/sync-wave: "-7"
   name: private-ca-issuer
 spec:
   ca:
@@ -1334,18 +1962,128 @@ apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
   annotations:
+    argocd.argoproj.io/hook: PreSync
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
-    argocd.argoproj.io/sync-wave: "-9"
+    argocd.argoproj.io/sync-wave: "-7"
   name: selfsigned-issuer
 spec:
   selfSigned: {}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: argocd-ingress
+  namespace: argocd
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: argocd.integration
+    http:
+      paths:
+      - backend:
+          service:
+            name: argocd-server
+            port:
+              number: 80
+        path: /
+        pathType: Prefix
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: decision-engine-ingress
+  namespace: idmg
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: database-controller.integration
+    http:
+      paths:
+      - backend:
+          service:
+            name: idmgdb
+            port:
+              number: 8080
+        path: /
+        pathType: Prefix
+  - host: data-generator.integration
+    http:
+      paths:
+      - backend:
+          service:
+            name: idmgdc
+            port:
+              number: 8080
+        path: /
+        pathType: Prefix
+  - host: plugin.integration
+    http:
+      paths:
+      - backend:
+          service:
+            name: idmgpl
+            port:
+              number: 8080
+        path: /
+        pathType: Prefix
+  - host: model.integration
+    http:
+      paths:
+      - backend:
+          service:
+            name: idmgml
+            port:
+              number: 8080
+        path: /
+        pathType: Prefix
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: kafdrop-ingress
+  namespace: kafdrop
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: kafdrop.integration
+    http:
+      paths:
+      - backend:
+          service:
+            name: kafdrop
+            port:
+              number: 80
+        path: /kafdrop/
+        pathType: Prefix
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.org/client-max-body-size: "0"
+  name: mef-sog-uc1-ingress
+  namespace: mef-sog-uc1-wl
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: mef-sog-uc1.integration
+    http:
+      paths:
+      - backend:
+          service:
+            name: scheduled-client-entrypoint
+            port:
+              number: 80
+        path: /
+        pathType: Prefix
 ---
 apiVersion: trust.cert-manager.io/v1alpha1
 kind: Bundle
 metadata:
   annotations:
+    argocd.argoproj.io/hook: PreSync
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
-    argocd.argoproj.io/sync-wave: "-9"
+    argocd.argoproj.io/sync-wave: "-7"
   name: ca-bundle
 spec:
   sources:
