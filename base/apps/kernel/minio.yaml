@@ -4,8 +4,9 @@ metadata:
   name: minio
   namespace: argocd
   annotations:
+    argocd.argoproj.io/hook: Sync
     argocd.argoproj.io/compare-options: ServerSideDiff=true
-    argocd.argoproj.io/sync-wave: "-7"
+    argocd.argoproj.io/sync-wave: "-6"
   finalizers:
   - resources-finalizer.argocd.argoproj.io
 spec:
