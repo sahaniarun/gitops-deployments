@@ -25,7 +25,6 @@ metadata:
   name: vault-certificate
   namespace: vault
   annotations:
-    argocd.argoproj.io/hook: PreSync
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
     argocd.argoproj.io/sync-wave: "-7"
 spec:
