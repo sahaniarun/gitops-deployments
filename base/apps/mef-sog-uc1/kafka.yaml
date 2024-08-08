@@ -1,0 +1,69 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kafka
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: 'https://glaciation-heu.github.io/mef-sog-uc1/'
+    targetRevision: 28.0.4
+    helm:
+      values: |
+        image:
+          tag: 3.5.1-debian-11-r25
+          pullPolicy: Always
+  
+        kraft:
+          enabled: false
+  
+        auth:
+          interBrokerProtocol: plaintext
+  
+        broker:
+          replicaCount: 3
+          podAntiAffinityPreset: hard
+          persistence:
+            enabled: true
+            storageClass: longhorn
+            accessModes:
+              - ReadWriteOnce
+            size: 2Gi
+  
+        controller:
+          replicaCount: 0
+  
+        zookeeper:
+          enabled: true
+          replicaCount: 3
+          podAntiAffinityPreset: hard
+          persistence:
+            enabled: true
+            storageClass: longhorn
+            accessModes:
+              - ReadWriteOnce
+            size: 5Gi
+  
+        listeners:
+          client:
+            protocol: plaintext
+  
+          interbroker:
+            protocol: plaintext
+  
+          external:
+            protocol: plaintext
+  
+        externalAccess:
+          enabled: false
+    chart: kafka
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: kafka
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true

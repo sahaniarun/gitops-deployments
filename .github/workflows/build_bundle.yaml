@@ -1,0 +1,40 @@
+name: Build Kustomize Bundle
+on:
+    push:
+        branches:
+        - 'Kustomized-deployments'
+        paths: 
+            - .github/**
+            - overlays/**
+            - base/**
+
+jobs:
+    kustomize:
+        name: Build Kustomize Bundle
+        runs-on: ubuntu-latest
+        env: 
+            CI_COMMIT_MESSAGE: Continuous Integration Build Artifacts
+            CI_COMMIT_AUTHOR: Continuous Integration
+        steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+          with:
+            ref: 'Kustomized-deployments'
+        - name: Kustomize Build
+          uses: karancode/kustomize-github-action@master
+          with:
+            kustomize_version: '5.4.0'
+            kustomize_build_dir: 'overlays/integration-base-test'
+            kustomize_comment: true
+            kustomize_output_file: "bundle/rendered.yaml"
+            token: ${{ github.token}}
+          env:
+            GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_ACCESS_TOKEN }}
+        - name: GIT Commit Kustomize Build Artifacts
+          if: github.event_name == 'push'
+          run: |
+            git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
+            git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add bundle/rendered.yaml
+            git commit -a -m "${{ env.CI_COMMIT_MESSAGE }}"
+            git push

@@ -1,0 +1,26 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: data-storage-service-db
+  namespace: argocd
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+spec:
+  destination:
+    namespace: dkg-engine
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    repoURL: https://glaciation-heu.github.io/glaciation-dssdb/helm-charts/
+    chart: data-storage-service-DB
+    targetRevision: 0.*.*
+    helm:
+      valuesObject:
+        ingressHostName: dss-db.integration
+  syncPolicy:
+    automated:
+     prune: true
+     selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
