@@ -1000,7 +1000,7 @@ kind: Application
 metadata:
   annotations:
     argocd.argoproj.io/compare-options: ServerSideDiff=true
-    argocd.argoproj.io/sync-wave: "-1"
+    argocd.argoproj.io/sync-wave: "-7"
   finalizers:
   - resources-finalizer.argocd.argoproj.io
   name: minio-tenant
