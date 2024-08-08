@@ -4,6 +4,9 @@ metadata:
   name: spark-app
   labels:
     create-ca-bundle: "true"
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/sync-wave: "-7"
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
