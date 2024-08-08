@@ -4,4 +4,4 @@ resources:
   - ./base
   - ./kernel
   - ./security
-  # - ./data-sanitization
+  - ./data-sanitization

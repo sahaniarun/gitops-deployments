@@ -9,4 +9,4 @@ resources:
   - gatekeeper-policy-manager.yaml
   - replicator.yaml
   - ./manual/vault-init.yaml
-  - ./gatekeeper-smoke-tests.yaml
+  - ./manual/gatekeeper-smoke-tests.yaml
