@@ -1889,7 +1889,6 @@ apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   annotations:
-    argocd.argoproj.io/hook: PreSync
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
     argocd.argoproj.io/sync-wave: "-7"
   name: my-selfsigned-ca
@@ -1910,7 +1909,6 @@ apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   annotations:
-    argocd.argoproj.io/hook: PreSync
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
     argocd.argoproj.io/sync-wave: "-7"
   name: vault-certificate
@@ -1950,7 +1948,6 @@ apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
   annotations:
-    argocd.argoproj.io/hook: PreSync
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
     argocd.argoproj.io/sync-wave: "-7"
   name: private-ca-issuer
@@ -1962,7 +1959,6 @@ apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
   annotations:
-    argocd.argoproj.io/hook: PreSync
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
     argocd.argoproj.io/sync-wave: "-7"
   name: selfsigned-issuer
