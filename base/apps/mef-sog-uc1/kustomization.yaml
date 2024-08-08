@@ -1,0 +1,7 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - kafdrop.yaml
+  - kafka.yaml
+  - keda.yaml
+  - mef-sog-uc1.yaml

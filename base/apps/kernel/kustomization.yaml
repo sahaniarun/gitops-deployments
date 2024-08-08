@@ -6,3 +6,4 @@ resources:
   - minio-tenant.yaml
   - monitoring-stack.yaml
   - metrics-server.yaml
+  - ./manual/minio-sse-smoke-tests.yaml

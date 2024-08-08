@@ -1,0 +1,71 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kg-exporter
+  namespace: argocd
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+spec:
+  destination:
+    namespace: dkg-engine
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    repoURL: https://glaciation-heu.github.io/kg_exporter/helm-charts/
+    chart: kg-exporter
+    targetRevision: 0.*.*
+    helm:
+      valuesObject:
+        ingressHostName: kg-exporter.integration
+
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 10
+          timeoutSeconds: 5
+
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 10
+          timeoutSeconds: 5
+
+        settings:
+          builder:
+            builder_tick_seconds: 60
+            node_port: 80
+            single_slice_url: http://metadata-service:80
+            is_single_slice: False
+            queries:
+              node_queries:
+                - measurement_id: Energy
+                  subresource: Energy
+                  source: Kepler
+                  unit: milliwatts
+                  property: Energy.Usage
+                  query: label_replace(kepler_node_platform_joules_total, "resource", "$1", "exported_instance", "(.+)")
+                  result_parser: PROMETHEUS_PARSER
+
+              pod_queries: []
+          k8s:
+            in_cluster: true
+          metadata:
+            metadata_service_url: metadata-service
+          prometheus:
+            endpoint_port: 8080
+          prometheus_client:
+            url: http://monitoring-stack-prometheus-server.monitoring
+  syncPolicy:
+    automated:
+     prune: true
+     selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
