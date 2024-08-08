@@ -5,3 +5,8 @@ resources:
   - ./kernel
   - ./security
   - ./data-sanitization
+  - ./ai-decision-engine
+  - ./ingresses
+  - ./semantification
+  - ./mef-sog-uc1
+  - ./dell-uc2
