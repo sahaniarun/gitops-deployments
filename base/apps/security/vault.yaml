@@ -3,7 +3,8 @@ kind: Namespace
 metadata:
   name: vault
   annotations:
-    argocd.argoproj.io/sync-wave: "-1"
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/sync-wave: "-7"
   labels:
     create-ca-bundle: "true"
 ---
@@ -13,7 +14,8 @@ metadata:
   name: minio-kes-secret
   namespace: vault
   annotations:
-    argocd.argoproj.io/sync-wave: "-1"
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/sync-wave: "-7"
     replicator.v1.mittwald.de/replicate-from: minio-tenant/minio-kes-secret
 data: {}
 ---
@@ -23,8 +25,9 @@ metadata:
   name: vault-certificate
   namespace: vault
   annotations:
+    argocd.argoproj.io/hook: PreSync
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
-    argocd.argoproj.io/sync-wave: "-1"
+    argocd.argoproj.io/sync-wave: "-7"
 spec:
   secretName: vault-tls
   issuerRef:
@@ -65,7 +68,7 @@ metadata:
   namespace: argocd
   annotations:
     argocd.argoproj.io/compare-options: ServerSideDiff=true
-    argocd.argoproj.io/sync-wave: "-1"
+    argocd.argoproj.io/sync-wave: "-6"
   finalizers:
    - resources-finalizer.argocd.argoproj.io
 spec:
@@ -176,7 +179,8 @@ metadata:
   name: kes-policy
   namespace: vault
   annotations:
-    argocd.argoproj.io/sync-wave: "-1"
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/sync-wave: "-7"
 data:
   kes-policy.hcl: |
     path "kv/data/minio-tenant/*" {

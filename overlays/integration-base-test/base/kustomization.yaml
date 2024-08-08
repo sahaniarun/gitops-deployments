@@ -3,4 +3,4 @@ kind: Kustomization
 resources:
   - ../../../base/apps/base
 patches:
-  - path: patch-optional.yaml  
+  - path: patch-waves.yaml  
