@@ -14,8 +14,8 @@ metadata:
   name: minio-kes-secret
   namespace: vault
   annotations:
-    argocd.argoproj.io/hook: PreSync
-    argocd.argoproj.io/sync-wave: "-7"
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/sync-wave: "-8"
     replicator.v1.mittwald.de/replicate-from: minio-tenant/minio-kes-secret
 data: {}
 ---
