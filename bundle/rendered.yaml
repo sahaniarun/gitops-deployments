@@ -11,7 +11,7 @@ kind: Namespace
 metadata:
   annotations:
     argocd.argoproj.io/hook: PreSync
-    argocd.argoproj.io/sync-wave: "-8"
+    argocd.argoproj.io/sync-wave: "-10"
   labels:
     create-ca-bundle: "true"
   name: minio-tenant
@@ -40,6 +40,7 @@ apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   annotations:
+    argocd.argoproj.io/hook: Sync
     argocd.argoproj.io/sync-wave: "-10"
   name: local-path
 provisioner: rancher.io/local-path
@@ -77,7 +78,7 @@ kind: ServiceAccount
 metadata:
   annotations:
     argocd.argoproj.io/hook: PreSync
-    argocd.argoproj.io/sync-wave: "-8"
+    argocd.argoproj.io/sync-wave: "-10"
   name: minio-kes
   namespace: minio-tenant
 ---
@@ -262,7 +263,7 @@ kind: ClusterRoleBinding
 metadata:
   annotations:
     argocd.argoproj.io/hook: PreSync
-    argocd.argoproj.io/sync-wave: "-8"
+    argocd.argoproj.io/sync-wave: "-10"
   name: role-tokenreview-binding
   namespace: minio-tenant
 roleRef:
@@ -400,7 +401,7 @@ kind: Secret
 metadata:
   annotations:
     argocd.argoproj.io/hook: PreSync
-    argocd.argoproj.io/sync-wave: "-8"
+    argocd.argoproj.io/sync-wave: "-10"
     kubernetes.io/service-account.name: minio-kes
     replicator.v1.mittwald.de/replication-allowed: "true"
     replicator.v1.mittwald.de/replication-allowed-namespaces: vault
@@ -513,7 +514,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/hook: Sync
     argocd.argoproj.io/sync-wave: "-9"
   name: local-path-provisioner
   namespace: local-path-storage
@@ -607,7 +608,7 @@ kind: Application
 metadata:
   annotations:
     argocd.argoproj.io/hook: Sync
-    argocd.argoproj.io/sync-wave: "-7"
+    argocd.argoproj.io/sync-wave: "-6"
   finalizers:
   - resources-finalizer.argocd.argoproj.io
   name: data-sanitization
@@ -767,6 +768,9 @@ spec:
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
+  annotations:
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/sync-wave: "-10"
   finalizers:
   - resources-finalizer.argocd.argoproj.io
   name: jena-fuseki
@@ -981,7 +985,7 @@ metadata:
   annotations:
     argocd.argoproj.io/compare-options: ServerSideDiff=true
     argocd.argoproj.io/hook: Sync
-    argocd.argoproj.io/sync-wave: "-6"
+    argocd.argoproj.io/sync-wave: "-7"
   finalizers:
   - resources-finalizer.argocd.argoproj.io
   name: minio
@@ -1015,7 +1019,7 @@ metadata:
   annotations:
     argocd.argoproj.io/compare-options: ServerSideDiff=true
     argocd.argoproj.io/hook: Sync
-    argocd.argoproj.io/sync-wave: "-6"
+    argocd.argoproj.io/sync-wave: "-7"
   finalizers:
   - resources-finalizer.argocd.argoproj.io
   name: minio-tenant
@@ -1355,6 +1359,9 @@ spec:
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
+  annotations:
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/sync-wave: "-8"
   finalizers:
   - resources-finalizer.argocd.argoproj.io
   name: semantification-service
@@ -1382,6 +1389,9 @@ spec:
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
+  annotations:
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/sync-wave: "-6"
   finalizers:
   - resources-finalizer.argocd.argoproj.io
   name: spark-history-server
@@ -1442,6 +1452,9 @@ spec:
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
+  annotations:
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/sync-wave: "-6"
   finalizers:
   - resources-finalizer.argocd.argoproj.io
   name: spark-operator
@@ -1931,6 +1944,7 @@ apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   annotations:
+    argocd.argoproj.io/hook: Sync
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
     argocd.argoproj.io/sync-wave: "-8"
   name: vault-certificate
@@ -2099,6 +2113,7 @@ apiVersion: trust.cert-manager.io/v1alpha1
 kind: Bundle
 metadata:
   annotations:
+    argocd.argoproj.io/hook: Sync
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
     argocd.argoproj.io/sync-wave: "-8"
   name: ca-bundle
