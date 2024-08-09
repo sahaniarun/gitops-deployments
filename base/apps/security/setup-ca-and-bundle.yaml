@@ -47,6 +47,7 @@ kind: Bundle
 metadata:
   name: ca-bundle
   annotations:
+    argocd.argoproj.io/hook: Sync
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
     argocd.argoproj.io/sync-wave: "-8"
 spec:

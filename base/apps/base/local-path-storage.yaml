@@ -88,8 +88,8 @@ metadata:
   name: local-path-provisioner
   namespace: local-path-storage
   annotations:
-    argocd.argoproj.io/hook: PreSync
-    argocd.argoproj.io/sync-wave: "-9"
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/sync-wave: "-10"
 spec:
   replicas: 1
   selector:
@@ -129,6 +129,7 @@ kind: StorageClass
 metadata:
   name: local-path
   annotations:
+    argocd.argoproj.io/hook: Sync
     argocd.argoproj.io/sync-wave: "-10"
 provisioner: rancher.io/local-path
 volumeBindingMode: WaitForFirstConsumer
