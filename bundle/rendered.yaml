@@ -667,6 +667,60 @@ spec:
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+  name: data-storage-service
+  namespace: argocd
+spec:
+  destination:
+    namespace: dkg-engine
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: data-storage-service
+    helm:
+      valuesObject:
+        ingressHostName: data-storage.integration
+    repoURL: https://glaciation-heu.github.io/glaciation-data-storage-service/helm-charts/
+    targetRevision: 0.*.*
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+    - ServerSideApply=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+  name: data-storage-service-db
+  namespace: argocd
+spec:
+  destination:
+    namespace: dkg-engine
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: data-storage-service-DB
+    helm:
+      valuesObject:
+        ingressHostName: dss-db.integration
+    repoURL: https://glaciation-heu.github.io/glaciation-dssdb/helm-charts/
+    targetRevision: 0.*.*
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+    - ServerSideApply=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
   annotations:
     argocd.argoproj.io/hook: Sync
     argocd.argoproj.io/sync-wave: "-8"
@@ -923,6 +977,75 @@ spec:
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+  name: kg-exporter
+  namespace: argocd
+spec:
+  destination:
+    namespace: dkg-engine
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: kg-exporter
+    helm:
+      valuesObject:
+        ingressHostName: kg-exporter.integration
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 10
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 10
+          timeoutSeconds: 5
+        settings:
+          builder:
+            builder_tick_seconds: 60
+            is_single_slice: false
+            node_port: 80
+            queries:
+              node_queries:
+              - measurement_id: Energy
+                property: Energy.Usage
+                query: label_replace(kepler_node_platform_joules_total, "resource",
+                  "$1", "exported_instance", "(.+)")
+                result_parser: PROMETHEUS_PARSER
+                source: Kepler
+                subresource: Energy
+                unit: milliwatts
+              pod_queries: []
+            single_slice_url: http://metadata-service:80
+          k8s:
+            in_cluster: true
+          metadata:
+            metadata_service_url: metadata-service
+          prometheus:
+            endpoint_port: 8080
+          prometheus_client:
+            url: http://monitoring-stack-prometheus-server.monitoring
+    repoURL: https://glaciation-heu.github.io/kg_exporter/helm-charts/
+    targetRevision: 0.*.*
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+    - ServerSideApply=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
   annotations:
     argocd.argoproj.io/hook: Sync
     argocd.argoproj.io/sync-wave: "-10"
@@ -971,6 +1094,33 @@ spec:
           logLevelJpa: true
     repoURL: https://glaciation-heu.github.io/mef-sog-uc1/
     targetRevision: 1.*.*
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+    - ServerSideApply=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+  name: metadata-service
+  namespace: argocd
+spec:
+  destination:
+    namespace: dkg-engine
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: metadata-service
+    helm:
+      valuesObject:
+        ingressHostName: metadata.integration
+    repoURL: https://glaciation-heu.github.io/glaciation-metadata-service/helm-charts/
+    targetRevision: 0.*.*
   syncPolicy:
     automated:
       prune: true
@@ -1332,6 +1482,33 @@ spec:
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+  name: prediction-service
+  namespace: argocd
+spec:
+  destination:
+    namespace: dkg-engine
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: prediction-service
+    helm:
+      valuesObject:
+        ingressHostName: prediction.integration
+    repoURL: https://glaciation-heu.github.io/glaciation-prediction-service/helm-charts/
+    targetRevision: 0.*.*
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+    - ServerSideApply=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
   annotations:
     argocd.argoproj.io/hook: Sync
     argocd.argoproj.io/sync-wave: "-8"
@@ -1535,6 +1712,30 @@ spec:
       valuesObject:
         ingressHostName: uc2-workload.integration
     repoURL: https://glaciation-heu.github.io/glaciation-uc2-workload-service/helm-charts/
+    targetRevision: 0.*.*
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+    - ServerSideApply=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+  name: ui-gateway
+  namespace: argocd
+spec:
+  destination:
+    namespace: dkg-engine
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: ui-gateway-server
+    repoURL: https://glaciation-heu.github.io/ui_gateway/helm-charts
     targetRevision: 0.*.*
   syncPolicy:
     automated:
