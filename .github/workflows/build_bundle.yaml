@@ -24,7 +24,7 @@ jobs:
           uses: karancode/kustomize-github-action@master
           with:
             kustomize_version: '5.4.0'
-            kustomize_build_dir: 'overlays/integration-base-test'
+            kustomize_build_dir: 'overlays/integration'
             kustomize_comment: true
             kustomize_output_file: "bundle/rendered.yaml"
             token: ${{ github.token}}
