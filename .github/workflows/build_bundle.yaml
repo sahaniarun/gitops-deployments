@@ -15,26 +15,42 @@ jobs:
         env: 
             CI_COMMIT_MESSAGE: Continuous Integration Build Artifacts
             CI_COMMIT_AUTHOR: Continuous Integration
+        strategy:
+            matrix:
+                overlay:
+                    - 'integration'
         steps:
         - name: Checkout
           uses: actions/checkout@v4
           with:
             ref: 'Kustomized-deployments'
+
         - name: Kustomize Build
           uses: karancode/kustomize-github-action@master
           with:
             kustomize_version: '5.4.0'
-            kustomize_build_dir: 'overlays/integration'
+            kustomize_build_dir: 'overlays/${{ matrix.overlay }}'
             kustomize_comment: true
-            kustomize_output_file: "bundle/rendered.yaml"
+            kustomize_output_file: "bundle/${{ matrix.overlay }}.yaml"
             token: ${{ github.token}}
           env:
             GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_ACCESS_TOKEN }}
+
+        - name: Check if deploy branch exists
+          run: |
+            if git show-ref --quiet refs/heads/deploy; then
+              echo "Branch 'deploy' exists."
+              git checkout deploy
+            else
+              echo "Branch 'deploy' does not exist. Creating branch."
+              git checkout -b deploy
+            fi
+
         - name: GIT Commit Kustomize Build Artifacts
           if: github.event_name == 'push'
           run: |
             git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
             git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add bundle/rendered.yaml
-            git commit -a -m "${{ env.CI_COMMIT_MESSAGE }}"
-            git push
+            git add bundle/${{ matrix.overlay }}.yaml
+            git commit -m "${{ env.CI_COMMIT_MESSAGE }} - ${{ matrix.overlay }}"
+            git push origin deploy
