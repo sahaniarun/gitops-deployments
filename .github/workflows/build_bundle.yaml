@@ -42,14 +42,11 @@ jobs:
             if git show-ref --quiet refs/heads/deploy; then
               echo "Branch 'deploy' exists."
               git checkout deploy
+              git pull
             else
               echo "Branch 'deploy' does not exist. Creating branch."
               git checkout -b deploy
             fi
-
-        - name: Pull latest changes from remote deploy branch
-          run: |
-            git pull origin deploy --rebase
 
         - name: GIT Commit Kustomize Build Artifacts
           if: github.event_name == 'push'
