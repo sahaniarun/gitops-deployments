@@ -52,6 +52,6 @@ jobs:
           run: |
             git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
             git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add bundle/${{ matrix.overlay }}.yaml
+            git add bundle/${{ matrix.overlay }}/${{ matrix.overlay }}.yaml
             git commit -m "${{ env.CI_COMMIT_MESSAGE }} - ${{ matrix.overlay }}"
             git push origin deploy
