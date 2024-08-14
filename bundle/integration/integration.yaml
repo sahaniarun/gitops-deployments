@@ -1011,19 +1011,8 @@ spec:
         settings:
           builder:
             builder_tick_seconds: 60
-            is_single_slice: false
+            is_single_slice: true
             node_port: 80
-            queries:
-              node_queries:
-              - measurement_id: Energy
-                property: Energy.Usage
-                query: label_replace(kepler_node_platform_joules_total, "resource",
-                  "$1", "exported_instance", "(.+)")
-                result_parser: PROMETHEUS_PARSER
-                source: Kepler
-                subresource: Energy
-                unit: milliwatts
-              pod_queries: []
             single_slice_url: http://metadata-service:80
           k8s:
             in_cluster: true
