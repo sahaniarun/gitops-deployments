@@ -42,18 +42,7 @@ spec:
             builder_tick_seconds: 60
             node_port: 80
             single_slice_url: http://metadata-service:80
-            is_single_slice: False
-            queries:
-              node_queries:
-                - measurement_id: Energy
-                  subresource: Energy
-                  source: Kepler
-                  unit: milliwatts
-                  property: Energy.Usage
-                  query: label_replace(kepler_node_platform_joules_total, "resource", "$1", "exported_instance", "(.+)")
-                  result_parser: PROMETHEUS_PARSER
-
-              pod_queries: []
+            is_single_slice: True
           k8s:
             in_cluster: true
           metadata:
