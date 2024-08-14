@@ -20,6 +20,7 @@ jobs:
             matrix:
                 overlay:
                     - 'integration'
+                    - 'UC2'
         steps:
         - name: Checkout
           uses: actions/checkout@v4
