@@ -26,6 +26,7 @@ jobs:
           uses: actions/checkout@v4
           with:
             ref: 'Kustomized-deployments'
+            fetch-depth: 0
 
         - name: Kustomize Build
           uses: karancode/kustomize-github-action@master
