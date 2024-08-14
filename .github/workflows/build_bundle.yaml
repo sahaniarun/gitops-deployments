@@ -1,0 +1,63 @@
+name: Build Kustomize Bundle
+on:
+    push:
+        branches:
+        - 'Kustomized-deployments'
+        - 'main'
+        paths: 
+            - .github/**
+            - overlays/**
+            - base/**
+
+jobs:
+    kustomize:
+        name: Build Kustomize Bundle
+        runs-on: ubuntu-latest
+        env: 
+            CI_COMMIT_MESSAGE: Continuous Integration Build Artifacts
+            CI_COMMIT_AUTHOR: Continuous Integration
+        strategy:
+            matrix:
+                overlay:
+                    - 'integration'
+                    - 'UC2'
+        steps:
+
+        - id: check-branch-exists
+          uses: GuillaumeFalourd/branch-exists@v1
+          with:
+            branch: 'deploy'
+
+        - if: steps.check-branch-exists.outputs.exists == 'false'
+          run: |
+            git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
+            git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git switch --orphan deploy 
+            git commit --allow-empty -m "Initial deploy commit"
+            git push -u origin deploy
+
+        - name: Checkout
+          uses: actions/checkout@v4
+          with:
+            ref: 'Kustomized-deployments'
+            fetch-depth: 0
+
+        - name: Kustomize Build
+          uses: karancode/kustomize-github-action@master
+          with:
+            kustomize_version: '5.4.0'
+            kustomize_build_dir: 'overlays/${{ matrix.overlay }}'
+            kustomize_comment: true
+            kustomize_output_file: "bundle/${{ matrix.overlay }}/${{ matrix.overlay }}.yaml"
+            token: ${{ github.token}}
+          env:
+            GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_ACCESS_TOKEN }}
+
+        - name: Deploy
+          uses: s0/git-publish-subdir-action@develop
+          env:  
+            REPO: self
+            BRANCH: deploy
+            FOLDER: "bundle/${{ matrix.overlay }}"
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            TARGET_DIR: "bundle/${{ matrix.overlay }}"

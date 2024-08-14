@@ -1,0 +1,54 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata: 
+  name: data-storage-service-db
+  namespace: argocd
+spec:
+  source:
+    helm: 
+      valuesObject: 
+        ingressHostName: dss-db.integration
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata: 
+  name: metadata-service
+  namespace: argocd
+spec:
+  source:
+    helm: 
+      valuesObject: 
+        ingressHostName: metadata.integration
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata: 
+  name: data-storage-service
+  namespace: argocd
+spec:
+  source:
+    helm: 
+      valuesObject: 
+        ingressHostName: data-storage.integration
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kg-exporter
+  namespace: argocd
+spec:
+  source:
+    helm: 
+      valuesObject: 
+        ingressHostName: kg-exporter.integration
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: prediction-service
+  namespace: argocd
+spec:
+  source:
+    helm: 
+      valuesObject: 
+        ingressHostName: prediction.integration
