@@ -28,6 +28,13 @@ jobs:
           with:
             branch: 'deploy'
 
+        - if: steps.check-branch-exists.outputs.exists == 'false'
+          run: |
+            git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
+            git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git switch --orphan deploy 
+            git commit --allow-empty -m "Initial deploy commit"
+            git push -u origin deploy
 
         - name: Checkout
           uses: actions/checkout@v4
@@ -46,21 +53,11 @@ jobs:
           env:
             GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_ACCESS_TOKEN }}
 
-        - if: steps.check-branch-exists.outputs.exists == 'false'
-          run: |
-            git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
-            git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git switch --orphan deploy 
-            git commit --allow-empty -m "Initial deploy commit"
-            git push -u origin deploy
-            
-
-
-        - name: GIT Commit Kustomize Build Artifacts
-          if: github.event_name == 'push'
-          run: |
-            git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
-            git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add bundle/${{ matrix.overlay }}/${{ matrix.overlay }}.yaml
-            git commit -m "${{ env.CI_COMMIT_MESSAGE }} - ${{ matrix.overlay }}"
-            git push origin deploy
+        - name: Deploy
+          uses: s0/git-publish-subdir-action@develop
+          env:  
+            REPO: self
+            BRANCH: deploy
+            FOLDER: "bundle/${{ matrix.overlay }}"
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            TARGET_DIR: "bundle/${{ matrix.overlay }}"
