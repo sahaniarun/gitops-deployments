@@ -8,8 +8,8 @@ spec:
   project: default
   source:
     repoURL: https://github.com/glaciation-heu/gitops-deployments
-    path: bundle
-    targetRevision: Kustomized-deployments
+    path: bundle/integration
+    targetRevision: deploy
     directory:
       recurse: true
   destination:
