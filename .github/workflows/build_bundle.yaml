@@ -38,17 +38,10 @@ jobs:
           env:
             GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_ACCESS_TOKEN }}
 
-        - name: Check if deploy branch exists
-          run: |
-            git fetch --all
-            if git show-ref --quiet refs/heads/deploy; then
-              echo "Branch 'deploy' exists."
-              git checkout deploy
-              git pull origin deploy --rebase
-            else
-              echo "Branch 'deploy' does not exist. Creating branch."
-              git checkout -b deploy
-            fi
+        - name: Checkout deploy branch
+          uses: actions/checkout@v4
+          with:
+            ref: 'deploy'
 
         - name: GIT Commit Kustomize Build Artifacts
           if: github.event_name == 'push'
