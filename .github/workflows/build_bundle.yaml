@@ -22,6 +22,13 @@ jobs:
                     - 'integration'
                     - 'UC2'
         steps:
+
+        - id: check-branch-exists
+          uses: GuillaumeFalourd/branch-exists@v1
+          with:
+            branch: 'deploy'
+
+
         - name: Checkout
           uses: actions/checkout@v4
           with:
@@ -39,7 +46,9 @@ jobs:
           env:
             GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_ACCESS_TOKEN }}
 
-   
+        - if: steps.check-branch-exists.outputs.exists == 'true'
+          run: echo 'deploy Branch exists'
+
 
         - name: GIT Commit Kustomize Build Artifacts
           if: github.event_name == 'push'
