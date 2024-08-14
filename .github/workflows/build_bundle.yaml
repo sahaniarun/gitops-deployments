@@ -49,7 +49,7 @@ jobs:
         - if: steps.check-branch-exists.outputs.exists == 'false'
           run: |
             git switch --orphan deploy 
-            git commit --allow-empty -m "Initial deploy commit'
+            git commit --allow-empty -m "Initial deploy commit"
             git push -u origin deploy
             
 
