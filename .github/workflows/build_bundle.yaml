@@ -39,6 +39,7 @@ jobs:
 
         - name: Check if deploy branch exists
           run: |
+            git fetch --all
             if git show-ref --quiet refs/heads/deploy; then
               echo "Branch 'deploy' exists."
               git checkout deploy
