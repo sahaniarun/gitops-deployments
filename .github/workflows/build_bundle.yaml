@@ -46,8 +46,12 @@ jobs:
           env:
             GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_ACCESS_TOKEN }}
 
-        - if: steps.check-branch-exists.outputs.exists == 'true'
-          run: echo 'deploy Branch exists'
+        - if: steps.check-branch-exists.outputs.exists == 'false'
+          run: |
+            git switch --orphan deploy 
+            git commit --allow-empty -m "Initial deploy commit'
+            git push -u origin deploy
+            
 
 
         - name: GIT Commit Kustomize Build Artifacts
