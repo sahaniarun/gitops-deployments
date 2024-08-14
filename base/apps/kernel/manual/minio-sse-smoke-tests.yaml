@@ -61,4 +61,4 @@ spec:
           sources:
           - secret:
               name: glaciation-env-configuration          
-  backoffLimit: 5
+  backoffLimit: 25
