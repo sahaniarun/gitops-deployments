@@ -1916,7 +1916,7 @@ metadata:
   name: minio-smoke-tests
   namespace: minio-tenant
 spec:
-  backoffLimit: 5
+  backoffLimit: 25
   template:
     spec:
       containers:
