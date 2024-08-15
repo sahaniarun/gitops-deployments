@@ -2,3 +2,34 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   - ../../../base/apps/ingresses
+patches:
+  - patch: |-
+      - op: replace
+        path: /spec/rules/0/host
+        value: argocd.uc2
+    target: 
+      group: networking.k8s.io
+      version: v1
+      kind: Ingress
+      name: argocd-ingress
+      namespace: argocd
+  - patch: |-
+      - op: replace
+        path: /spec/rules/0/host
+        value: kafdrop.uc2
+    target:
+      group: networking.k8s.io
+      version: v1
+      kind: Ingress
+      name: kafdrop-ingress
+      namespace: kafdrop
+  - patch: |-
+      - op: replace
+        path: /spec/rules/0/host
+        value: mef-cog-uc1.uc2
+    target:
+      group: networking.k8s.io
+      version: v1
+      kind: Ingress
+      name: mef-sog-uc1-ingress
+      namespace: mef-sog-uc1-wl
