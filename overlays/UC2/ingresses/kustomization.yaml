@@ -3,4 +3,23 @@ kind: Kustomization
 resources:
   - ../../../base/apps/ingresses
 patches:
-  - path: host-patch.yaml
+  - patch: |-
+      - op: replace
+        path: /spec/rules/0/host
+        value: argocd.uc2
+    target: 
+      group: networking.k8s.io
+      version: v1
+      kind: Ingress
+      name: argocd-ingress
+      namespace: argocd
+  - patch: |-
+      - op: replace
+        path: /spec/rules/0/host
+        value: kafdrop.uc2
+    target:
+      group: networking.k8s.io
+      version: v1
+      kind: Ingress
+      name: kafdrop-ingress
+      namespace: kafdrop
