@@ -24,6 +24,16 @@ metadata:
     argocd.argoproj.io/sync-wave: "-7"
   labels:
     create-ca-bundle: "true"
+  name: spark-app
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/sync-wave: "-7"
+  labels:
+    create-ca-bundle: "true"
   name: vault
 ---
 apiVersion: storage.k8s.io/v1
@@ -598,6 +608,121 @@ kind: Application
 metadata:
   annotations:
     argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/sync-wave: "-6"
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+  name: data-sanitization
+  namespace: argocd
+spec:
+  destination:
+    namespace: spark-app
+    server: https://kubernetes.default.svc
+  project: default
+  sources:
+  - chart: data-sanitization
+    helm:
+      valuesObject:
+        ingress:
+          className: nginx
+          enabled: true
+          hosts:
+          - host: data-sanitization.uc2
+            paths:
+            - path: /
+              pathType: Prefix
+        resources:
+          limits:
+            cpu: 500m
+            memory: 1024Mi
+          requests:
+            cpu: 250m
+            memory: 512Mi
+        s3:
+          accessKeyId: minio
+          certificate: /etc/ssl/certs/ca.crt
+          endpoint: minio.minio-tenant.svc.cluster.local
+          secretAccessKey: minio123
+        secret:
+          create: true
+          name: minio-credentials
+        volumeMounts:
+        - mountPath: /etc/ssl/certs/ca.crt
+          name: ca-bundle
+          readOnly: true
+          subPath: ca.crt
+        volumes:
+        - configMap:
+            defaultMode: 422
+            name: ca-bundle
+          name: ca-bundle
+    repoURL: https://glaciation-heu.github.io/data-sanitization-service
+    targetRevision: 0.2.2
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - ServerSideApply=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+  name: data-storage-service
+  namespace: argocd
+spec:
+  destination:
+    namespace: dkg-engine
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: data-storage-service
+    helm:
+      valuesObject:
+        ingressHostName: data-storage.uc2
+    repoURL: https://glaciation-heu.github.io/glaciation-data-storage-service/helm-charts/
+    targetRevision: 0.*.*
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+    - ServerSideApply=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+  name: data-storage-service-db
+  namespace: argocd
+spec:
+  destination:
+    namespace: dkg-engine
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: data-storage-service-DB
+    helm:
+      valuesObject:
+        ingressHostName: dss-db.uc2
+    repoURL: https://glaciation-heu.github.io/glaciation-dssdb/helm-charts/
+    targetRevision: 0.*.*
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+    - ServerSideApply=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  annotations:
+    argocd.argoproj.io/hook: Sync
     argocd.argoproj.io/sync-wave: "-8"
   finalizers:
   - resources-finalizer.argocd.argoproj.io
@@ -673,6 +798,30 @@ spec:
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+  name: idmg-decision-engine
+  namespace: argocd
+spec:
+  destination:
+    namespace: idmg
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: cf
+    repoURL: https://idmg-pub.gitlab.io/helm-charts/
+    targetRevision: 0.*.*
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+    - ServerSideApply=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
   annotations:
     argocd.argoproj.io/hook: Sync
     argocd.argoproj.io/sync-wave: "-10"
@@ -703,6 +852,189 @@ spec:
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
+  name: kafdrop
+  namespace: argocd
+spec:
+  destination:
+    namespace: kafdrop
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: kafdrop
+    helm:
+      values: |
+        server:
+          servlet:
+            contextPath: /kafdrop
+        service:
+          annotations: {}
+          type: ClusterIP
+          port: 80
+        kafka:
+          brokerConnect: kafka.kafka.svc.cluster.local:9092
+    repoURL: https://glaciation-heu.github.io/mef-sog-uc1/
+    targetRevision: 0.1.0
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+    - ServerSideApply=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kafka
+  namespace: argocd
+spec:
+  destination:
+    namespace: kafka
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: kafka
+    helm:
+      values: |
+        image:
+          tag: 3.5.1-debian-11-r25
+          pullPolicy: Always
+
+        kraft:
+          enabled: false
+
+        auth:
+          interBrokerProtocol: plaintext
+
+        broker:
+          replicaCount: 3
+          podAntiAffinityPreset: hard
+          persistence:
+            enabled: true
+            storageClass: longhorn
+            accessModes:
+              - ReadWriteOnce
+            size: 2Gi
+
+        controller:
+          replicaCount: 0
+
+        zookeeper:
+          enabled: true
+          replicaCount: 3
+          podAntiAffinityPreset: hard
+          persistence:
+            enabled: true
+            storageClass: longhorn
+            accessModes:
+              - ReadWriteOnce
+            size: 5Gi
+
+        listeners:
+          client:
+            protocol: plaintext
+
+          interbroker:
+            protocol: plaintext
+
+          external:
+            protocol: plaintext
+
+        externalAccess:
+          enabled: false
+    repoURL: https://glaciation-heu.github.io/mef-sog-uc1/
+    targetRevision: 28.0.4
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+    - ServerSideApply=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: keda
+  namespace: argocd
+spec:
+  destination:
+    namespace: keda
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: keda
+    repoURL: https://kedacore.github.io/charts
+    targetRevision: 2.14.0
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+    - ServerSideApply=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+  name: kg-exporter
+  namespace: argocd
+spec:
+  destination:
+    namespace: dkg-engine
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: kg-exporter
+    helm:
+      valuesObject:
+        ingressHostName: kg-exporter.uc2
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 10
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 10
+          timeoutSeconds: 5
+        settings:
+          builder:
+            builder_tick_seconds: 60
+            is_single_slice: true
+            node_port: 80
+            single_slice_url: http://metadata-service:80
+          k8s:
+            in_cluster: true
+          metadata:
+            metadata_service_url: metadata-service
+          prometheus:
+            endpoint_port: 8080
+          prometheus_client:
+            url: http://monitoring-stack-prometheus-server.monitoring
+    repoURL: https://glaciation-heu.github.io/kg_exporter/helm-charts/
+    targetRevision: 0.*.*
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+    - ServerSideApply=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
   annotations:
     argocd.argoproj.io/hook: Sync
     argocd.argoproj.io/sync-wave: "-10"
@@ -721,6 +1053,63 @@ spec:
           jobEnabled: false
     repoURL: https://charts.longhorn.io/
     targetRevision: v1.6.0
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+    - ServerSideApply=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: mef-sog-uc1-wl
+  namespace: argocd
+spec:
+  destination:
+    namespace: mef-sog-uc1-wl
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: mef-sog-uc1-wl
+    helm:
+      values: |
+        scheduledClient:
+          service:
+            type: ClusterIP
+            port: 80
+        elaborationTimbMs:
+          logLevelJpa: true
+    repoURL: https://glaciation-heu.github.io/mef-sog-uc1/
+    targetRevision: 1.*.*
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+    - ServerSideApply=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+  name: metadata-service
+  namespace: argocd
+spec:
+  destination:
+    namespace: dkg-engine
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: metadata-service
+    helm:
+      valuesObject:
+        ingressHostName: metadata.uc2
+    repoURL: https://glaciation-heu.github.io/glaciation-metadata-service/helm-charts/
+    targetRevision: 0.*.*
   syncPolicy:
     automated:
       prune: true
@@ -994,6 +1383,42 @@ spec:
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+  name: neo4j
+  namespace: argocd
+spec:
+  destination:
+    namespace: idmg
+    server: https://kubernetes.default.svc
+  project: default
+  sources:
+  - chart: neo4j
+    helm:
+      valuesObject:
+        neo4j:
+          name: idmg
+          password: password
+        services:
+          neo4j:
+            spec:
+              type: ClusterIP
+        volumes:
+          data:
+            mode: defaultStorageClass
+    repoURL: https://neo4j.github.io/helm-charts/
+    targetRevision: 5.21.2
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+    - ServerSideApply=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
   annotations:
     argocd.argoproj.io/hook: Sync
     argocd.argoproj.io/sync-wave: "-10"
@@ -1046,6 +1471,33 @@ spec:
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+  name: prediction-service
+  namespace: argocd
+spec:
+  destination:
+    namespace: dkg-engine
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: prediction-service
+    helm:
+      valuesObject:
+        ingressHostName: prediction.uc2
+    repoURL: https://glaciation-heu.github.io/glaciation-prediction-service/helm-charts/
+    targetRevision: 0.*.*
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+    - ServerSideApply=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
   annotations:
     argocd.argoproj.io/hook: Sync
     argocd.argoproj.io/sync-wave: "-8"
@@ -1062,6 +1514,132 @@ spec:
     chart: kubernetes-replicator
     repoURL: https://helm.mittwald.de
     targetRevision: 2.9.2
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+    - ServerSideApply=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  annotations:
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/sync-wave: "-8"
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+  name: semantification-service
+  namespace: argocd
+spec:
+  destination:
+    namespace: semantification
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: semantification-service
+    helm:
+      valuesObject:
+        ingressHostName: semantification.uc2
+    repoURL: https://glaciation-heu.github.io/glaciation-semantification-service/helm-charts/
+    targetRevision: 0.*.*
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+    - ServerSideApply=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  annotations:
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/sync-wave: "-6"
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+  name: spark-history-server
+  namespace: argocd
+spec:
+  destination:
+    namespace: spark-app
+    server: https://kubernetes.default.svc
+  project: default
+  sources:
+  - chart: spark-history-server
+    helm:
+      valuesObject:
+        ingress:
+          className: nginx
+          enabled: true
+          hosts:
+          - host: spark-history-server.uc2
+            paths:
+            - path: /
+              pathType: Prefix
+        resources:
+          limits:
+            cpu: 500m
+            memory: 1024Mi
+          requests:
+            cpu: 250m
+            memory: 512Mi
+        s3:
+          bucket: sanitization/spark-events
+          endpoint: minio.minio-tenant.svc.cluster.local
+        secret:
+          create: false
+          name: minio-credentials
+        volumeMounts:
+        - mountPath: /etc/ssl/certs/ca.crt
+          name: ca
+          readOnly: true
+          subPath: ca.crt
+        - mountPath: /opt/java/openjdk/lib/security/cacerts
+          name: ca
+          readOnly: true
+          subPath: ca.jks
+        volumes:
+        - configMap:
+            defaultMode: 422
+            name: ca-bundle
+          name: ca
+    repoURL: https://glaciation-heu.github.io/spark-history-server
+    targetRevision: 1.0.3
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - ServerSideApply=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  annotations:
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/sync-wave: "-6"
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+  name: spark-operator
+  namespace: argocd
+spec:
+  destination:
+    namespace: spark-operator
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: spark-operator
+    helm:
+      valuesObject:
+        sparkJobNamespaces:
+        - spark-app
+        webhook:
+          enable: true
+    repoURL: https://kubeflow.github.io/spark-operator/
+    targetRevision: 1.2.14
   syncPolicy:
     automated:
       prune: true
@@ -1103,6 +1681,57 @@ spec:
       prune: true
       selfHeal: true
     syncOptions:
+    - ServerSideApply=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+  name: uc2-workload-service
+  namespace: argocd
+spec:
+  destination:
+    namespace: uc2
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: uc2-workload
+    helm:
+      valuesObject:
+        ingressHostName: uc2-workload.uc2
+    repoURL: https://glaciation-heu.github.io/glaciation-uc2-workload-service/helm-charts/
+    targetRevision: 0.*.*
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+    - ServerSideApply=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+  name: ui-gateway
+  namespace: argocd
+spec:
+  destination:
+    namespace: dkg-engine
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: ui-gateway-server
+    repoURL: https://glaciation-heu.github.io/ui_gateway/helm-charts
+    targetRevision: 0.*.*
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
     - ServerSideApply=true
 ---
 apiVersion: argoproj.io/v1alpha1
@@ -1578,6 +2207,55 @@ spec:
             name: argocd-server
             port:
               number: 80
+        path: /
+        pathType: Prefix
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: decision-engine-ingress
+  namespace: idmg
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: database-controller.uc2
+    http:
+      paths:
+      - backend:
+          service:
+            name: idmgdb
+            port:
+              number: 8080
+        path: /
+        pathType: Prefix
+  - host: data-generator.uc2
+    http:
+      paths:
+      - backend:
+          service:
+            name: idmgdc
+            port:
+              number: 8080
+        path: /
+        pathType: Prefix
+  - host: plugin.uc2
+    http:
+      paths:
+      - backend:
+          service:
+            name: idmgpl
+            port:
+              number: 8080
+        path: /
+        pathType: Prefix
+  - host: pluginmodel.uc2
+    http:
+      paths:
+      - backend:
+          service:
+            name: idmgml
+            port:
+              number: 8080
         path: /
         pathType: Prefix
 ---
