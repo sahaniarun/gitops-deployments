@@ -7,7 +7,7 @@ spec:
   source:
     helm: 
       valuesObject: 
-        ingressHostName: dss-db.integration
+        ingressHostName: dss-db.uc2
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
@@ -18,7 +18,7 @@ spec:
   source:
     helm: 
       valuesObject: 
-        ingressHostName: metadata.integration
+        ingressHostName: metadata.uc2
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
@@ -29,7 +29,7 @@ spec:
   source:
     helm: 
       valuesObject: 
-        ingressHostName: data-storage.integration
+        ingressHostName: data-storage.uc2
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
@@ -40,7 +40,7 @@ spec:
   source:
     helm: 
       valuesObject: 
-        ingressHostName: kg-exporter.integration
+        ingressHostName: kg-exporter.uc2
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
@@ -51,4 +51,4 @@ spec:
   source:
     helm: 
       valuesObject: 
-        ingressHostName: prediction.integration
+        ingressHostName: prediction.uc2

@@ -4,10 +4,10 @@ resources:
   - ./base
   - ./kernel
   - ./security
-  # - ./data-sanitization
-  # - ./ai-decision-engine
+  - ./data-sanitization
+  - ./ai-decision-engine
   - ./ingresses
-  # - ./semantification
-  # - ./mef-sog-uc1
-  # - ./dell-uc2
-  # - ./dkg-engine
+  - ./semantification
+  - ./mef-sog-uc1
+  - ./dell-uc2
+  - ./dkg-engine
