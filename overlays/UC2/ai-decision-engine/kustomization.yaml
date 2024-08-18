@@ -36,7 +36,7 @@ patches:
   - patch: |-
       - op: replace
         path: /spec/rules/3/host
-        value: pluginmodel.uc2
+        value: model.uc2
     target: 
       group: networking.k8s.io
       version: v1
