@@ -3,4 +3,14 @@ kind: Kustomization
 resources:
   - ../../../base/apps/base
 patches:
-  - path: patch-waves.yaml  
+  - path: patch-waves.yaml
+  - patch: |-
+      - op: replace
+        path: /spec/source/helm/valuesObject/ingressHostName
+        value: jena-fuseki.uc2
+    target:
+      group: argoproj.io
+      version: v1alpha1
+      kind: Application
+      name: jena-fuseki
+      namespace: argocd
