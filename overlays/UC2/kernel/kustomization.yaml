@@ -43,3 +43,23 @@ patches:
       kind: Application
       name: vault
       namespace: argocd
+  - patch: |-
+      - op: replace
+        path: /spec/sources/0/helm/valuesObject/ingress/hosts/0/host
+        value: prometheus.uc2
+    target:
+      group: argoproj.io
+      version: v1alpha1
+      kind: Application
+      name: vault
+      namespace: monitoring
+  - patch: |-
+      - op: replace
+        path: /spec/sources/0/helm/valuesObject/ingress/hosts/3/host
+        value: grafana.uc2
+    target:
+      group: argoproj.io
+      version: v1alpha1
+      kind: Application
+      name: vault
+      namespace: monitoring
