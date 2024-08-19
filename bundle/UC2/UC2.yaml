@@ -780,7 +780,7 @@ spec:
         ingress:
           enabled: true
           hosts:
-          - host: gpm.integration
+          - host: gpm.uc2
             pathType: Prefix
             paths:
             - /
@@ -838,7 +838,7 @@ spec:
     chart: jena-fuseki
     helm:
       valuesObject:
-        ingressHostName: jena-fuseki.integration
+        ingressHostName: jena-fuseki.uc2
     repoURL: https://glaciation-heu.github.io/jena-fuseki/helm-charts/
     targetRevision: 1.*.*
   syncPolicy:
@@ -1318,8 +1318,7 @@ spec:
               viewers_can_edit: true
           ingress:
             enabled: true
-            hosts:
-            - grafana.integration
+            hosts: grafana.uc2
             ingressClassName: nginx
             path: /
             pathType: Prefix
@@ -1342,8 +1341,7 @@ spec:
           server:
             ingress:
               enabled: true
-              hosts:
-              - prometheus.integration
+              hosts: prometheus.uc2
               ingressClassName: nginx
         telegraf:
           config:
@@ -1803,7 +1801,7 @@ spec:
               nginx.ingress.kubernetes.io/backend-protocol: HTTPS
             enabled: true
             hosts:
-            - host: vault.integration
+            - host: vault.uc2
             ingressClassName: nginx
           resources:
             limits:
@@ -2218,7 +2216,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  - host: database-controller.uc2
+  - host: database-controller.integration
     http:
       paths:
       - backend:
@@ -2228,7 +2226,7 @@ spec:
               number: 8080
         path: /
         pathType: Prefix
-  - host: data-generator.uc2
+  - host: data-generator.integration
     http:
       paths:
       - backend:
@@ -2238,7 +2236,7 @@ spec:
               number: 8080
         path: /
         pathType: Prefix
-  - host: plugin.uc2
+  - host: plugin.integration
     http:
       paths:
       - backend:
@@ -2248,7 +2246,7 @@ spec:
               number: 8080
         path: /
         pathType: Prefix
-  - host: model.uc2
+  - host: model.integration
     http:
       paths:
       - backend:
