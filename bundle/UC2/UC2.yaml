@@ -1318,7 +1318,8 @@ spec:
               viewers_can_edit: true
           ingress:
             enabled: true
-            hosts: grafana.uc2
+            hosts:
+            - grafana.integration
             ingressClassName: nginx
             path: /
             pathType: Prefix
@@ -1341,7 +1342,8 @@ spec:
           server:
             ingress:
               enabled: true
-              hosts: prometheus.uc2
+              hosts:
+              - prometheus.integration
               ingressClassName: nginx
         telegraf:
           config:
