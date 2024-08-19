@@ -2238,7 +2238,7 @@ spec:
               number: 8080
         path: /
         pathType: Prefix
-  - host: plugin-test.uc2
+  - host: plugin.uc2
     http:
       paths:
       - backend:
