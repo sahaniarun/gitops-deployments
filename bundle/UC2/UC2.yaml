@@ -1438,7 +1438,7 @@ spec:
         controller:
           config:
             entries:
-              external-status-address: 10.1.14.160
+              external-status-address: 10.14.2.5
           kind: deployment
           nodeSelector:
             master: "true"
