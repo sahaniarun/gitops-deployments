@@ -1342,8 +1342,7 @@ spec:
           server:
             ingress:
               enabled: true
-              hosts:
-              - prometheus.uc2
+              hosts: prometheus.uc2
               ingressClassName: nginx
         telegraf:
           config:
