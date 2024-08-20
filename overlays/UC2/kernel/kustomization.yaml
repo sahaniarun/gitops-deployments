@@ -3,6 +3,7 @@ kind: Kustomization
 resources:
   - ../../../base/apps/kernel
 patches: 
+  - path: patch-optional.yaml
   - patch: |-
       - op: replace
         path: /spec/sources/0/helm/valuesObject/ingress/api/host
