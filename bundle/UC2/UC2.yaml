@@ -1343,7 +1343,7 @@ spec:
             ingress:
               enabled: true
               hosts:
-              - prometheus.integration
+              - prometheus.uc2
               ingressClassName: nginx
         telegraf:
           config:
