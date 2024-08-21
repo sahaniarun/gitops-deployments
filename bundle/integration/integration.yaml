@@ -885,8 +885,6 @@ spec:
 annotations:
   argocd.argoproj.io/compare-options: ServerSideDiff=true,IncludeMutationWebhook=true
 apiVersion: argoproj.io/v1alpha1
-finalizers:
-- resources-finalizer.argocd.argoproj.io
 kind: Application
 metadata:
   name: kafka
