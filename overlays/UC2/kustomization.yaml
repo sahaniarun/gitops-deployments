@@ -5,7 +5,7 @@ resources:
   - ./kernel
   - ./security
   - ./data-sanitization
-  - ./ai-decision-engine
+ # - ./ai-decision-engine
   - ./ingresses
   - ./semantification
   - ./mef-sog-uc1
