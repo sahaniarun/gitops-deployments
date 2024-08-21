@@ -798,30 +798,6 @@ spec:
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  finalizers:
-  - resources-finalizer.argocd.argoproj.io
-  name: idmg-decision-engine
-  namespace: argocd
-spec:
-  destination:
-    namespace: idmg
-    server: https://kubernetes.default.svc
-  project: default
-  source:
-    chart: cf
-    repoURL: https://idmg-pub.gitlab.io/helm-charts/
-    targetRevision: 0.*.*
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-    syncOptions:
-    - CreateNamespace=true
-    - ServerSideApply=true
----
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
   annotations:
     argocd.argoproj.io/hook: Sync
     argocd.argoproj.io/sync-wave: "-10"
@@ -1374,44 +1350,6 @@ spec:
               memory: 1Gi
     repoURL: https://hiro-microdatacenters-bv.github.io/monitoring-stack/helm-charts/
     targetRevision: 1.0.*
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-    syncOptions:
-    - CreateNamespace=true
-    - ServerSideApply=true
----
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  annotations:
-    argocd.argoproj.io/compare-options: ServerSideDiff=true,IncludeMutationWebhook=true
-  finalizers:
-  - resources-finalizer.argocd.argoproj.io
-  name: neo4j
-  namespace: argocd
-spec:
-  destination:
-    namespace: idmg
-    server: https://kubernetes.default.svc
-  project: default
-  sources:
-  - chart: neo4j
-    helm:
-      valuesObject:
-        neo4j:
-          name: idmg
-          password: password
-        services:
-          neo4j:
-            spec:
-              type: ClusterIP
-        volumes:
-          data:
-            mode: defaultStorageClass
-    repoURL: https://neo4j.github.io/helm-charts/
-    targetRevision: 5.21.2
   syncPolicy:
     automated:
       prune: true
@@ -2211,55 +2149,6 @@ spec:
             name: argocd-server
             port:
               number: 80
-        path: /
-        pathType: Prefix
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: decision-engine-ingress
-  namespace: idmg
-spec:
-  ingressClassName: nginx
-  rules:
-  - host: database-controller.uc2
-    http:
-      paths:
-      - backend:
-          service:
-            name: idmgdb
-            port:
-              number: 8080
-        path: /
-        pathType: Prefix
-  - host: data-generator.uc2
-    http:
-      paths:
-      - backend:
-          service:
-            name: idmgdc
-            port:
-              number: 8080
-        path: /
-        pathType: Prefix
-  - host: plugin.uc2
-    http:
-      paths:
-      - backend:
-          service:
-            name: idmgpl
-            port:
-              number: 8080
-        path: /
-        pathType: Prefix
-  - host: model.uc2
-    http:
-      paths:
-      - backend:
-          service:
-            name: idmgml
-            port:
-              number: 8080
         path: /
         pathType: Prefix
 ---
