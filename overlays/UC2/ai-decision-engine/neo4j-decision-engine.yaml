@@ -1,0 +1,38 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: neo4j
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/compare-options: ServerSideDiff=true,IncludeMutationWebhook=true
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  sources:
+    - chart: neo4j
+      repoURL: https://neo4j.github.io/helm-charts/
+      targetRevision: 5.21.2
+      helm:
+        valuesObject:
+          volumes:
+            data:
+              mode: defaultStorageClass
+          neo4j:
+            name: idmg
+            password: password
+          # user: neo4j
+          services:
+            neo4j:
+              spec:
+                type: ClusterIP
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: idmg
+  syncPolicy:
+    automated: 
+     prune: true 
+     selfHeal: true 
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
