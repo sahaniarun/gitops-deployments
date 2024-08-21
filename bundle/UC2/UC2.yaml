@@ -2222,7 +2222,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  - host: idmgdatabase-controller.uc2
+  - host: database-controller.integration
     http:
       paths:
       - backend:
@@ -2232,7 +2232,7 @@ spec:
               number: 8080
         path: /
         pathType: Prefix
-  - host: data-generator.uc2
+  - host: data-generator.integration
     http:
       paths:
       - backend:
@@ -2242,7 +2242,7 @@ spec:
               number: 8080
         path: /
         pathType: Prefix
-  - host: plugin.uc2
+  - host: plugin.integration
     http:
       paths:
       - backend:
@@ -2252,7 +2252,7 @@ spec:
               number: 8080
         path: /
         pathType: Prefix
-  - host: model.uc2
+  - host: model.integration
     http:
       paths:
       - backend:
